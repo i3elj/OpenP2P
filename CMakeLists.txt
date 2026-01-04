@@ -22,8 +22,8 @@ qt_add_qml_module(appp2pcom
         Main.qml
         SOURCES gui/addrlabel.h gui/addrlabel.cpp
         SOURCES ipv6addrresolver.h ipv6addrresolver.cpp
-        SOURCES
         SOURCES server.h server.cpp
+        SOURCES serverthread.h serverthread.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
