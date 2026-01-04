@@ -22,7 +22,8 @@ Window {
                 property var ipModel: []
 
                 AddrLabel {
-                    onIpReceived: function (ips) {
+                    id: addrLabel
+                    onIpsReceived: function (ips) {
                         ipList.ipModel = ips
                     }
                 }
@@ -33,7 +34,6 @@ Window {
                     TextEdit {
                         required property string modelData
 
-                        id: addrLabel
                         text: modelData
                         readOnly: true
                         selectByMouse: true
