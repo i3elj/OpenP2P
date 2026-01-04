@@ -3,19 +3,19 @@
 
 #include <QThread>
 #include <QUdpSocket>
+#include "ipv6addrresolver.h"
 
 class Server : public QObject
 {
     Q_OBJECT
 
 private:
-    QThread *thread;
     QUdpSocket *socket;
+    IPv6AddrResolver *ipr;
 
 public:
     explicit Server(QObject *parent = nullptr);
     ~Server();
-    void init();
 
 public slots:
     void initUdpSocket();

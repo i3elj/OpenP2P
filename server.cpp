@@ -6,18 +6,15 @@
 Server::Server(QObject *parent)
     : QObject{parent}
 {
-    thread = new QThread;
-
-    moveToThread(thread);
-    connect(thread, &QThread::started, this, &Server::initUdpSocket);
-
-    this->thread->start();
 }
 
 void Server::initUdpSocket()
 {
     socket = new QUdpSocket(this);
-    socket->bind(QHostAddress::LocalHost, 7755);
+    ipr = new IPv6AddrResolver(this);
+    QList<QHostAddress> ips = ipr->resolve();
+
+    socket->bind(ips.first(), 7755);
 
     connect(socket, &QUdpSocket::readyRead, this, &Server::readPendingDatagrams);
 }
@@ -31,10 +28,4 @@ void Server::readPendingDatagrams()
     }
 }
 
-Server::~Server()
-{
-    if (thread->isRunning()) {
-        thread->quit();
-        thread->wait();
-    }
-}
+Server::~Server() {}

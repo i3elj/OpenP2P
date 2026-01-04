@@ -2,7 +2,7 @@
 #include <QObject>
 #include <QQmlApplicationEngine>
 #include "gui/addrlabel.h"
-#include "server.h"
+#include "serverthread.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,7 +18,8 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<AddrLabel>("App", 1, 0, "AddrLabel");
 
-    Server s;
+    ServerThread serverThread(&app);
+    serverThread.start();
 
     engine.loadFromModule("p2pcom", "Main");
 
