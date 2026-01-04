@@ -1,8 +1,8 @@
 #ifndef IPV6ADDRRESOLVER_H
 #define IPV6ADDRRESOLVER_H
 
+#include <QHostAddress>
 #include <QObject>
-#include <qhostaddress.h>
 
 class IPv6AddrResolver : public QObject
 {
@@ -10,7 +10,7 @@ class IPv6AddrResolver : public QObject
 
 public:
     explicit IPv6AddrResolver(QObject *parent = nullptr);
-    QStringList resolve();
+    QList<QHostAddress> resolve();
 
 signals:
     void finished(QStringList ips);

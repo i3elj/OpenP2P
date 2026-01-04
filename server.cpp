@@ -1,7 +1,6 @@
 #include "server.h"
 #include <QDebug>
 #include <QNetworkDatagram>
-#include <QThread>
 
 Server::Server(QObject *parent)
     : QObject{parent}

@@ -1,5 +1,4 @@
 #include "serverthread.h"
-#include <qdebug.h>
 
 ServerThread::ServerThread(QObject *parent)
     : QObject{parent}
