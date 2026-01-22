@@ -7,8 +7,6 @@ set(CMAKE_CXX_STANDARD 23)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt6 REQUIRED COMPONENTS Core)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -18,12 +16,14 @@ qt_add_executable(appp2pcom
 
 qt_add_qml_module(appp2pcom
     URI p2pcom
-    QML_FILES
-        Main.qml
-        SOURCES gui/addrlabel.h gui/addrlabel.cpp
-        SOURCES ipv6addrresolver.h ipv6addrresolver.cpp
-        SOURCES server.h server.cpp
-        SOURCES serverthread.h serverthread.cpp
+    QML_FILES gui/qml/Main.qml
+    QML_FILES gui/qml/MessageHandler.qml
+    QML_FILES gui/qml/PeerConnection.qml
+    SOURCES gui/addrlabel.h gui/addrlabel.cpp
+    SOURCES ipv6addrresolver.h ipv6addrresolver.cpp
+    SOURCES server.h server.cpp
+    SOURCES peer.h peer.cpp
+    SOURCES peerid.h
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -40,8 +40,6 @@ set_target_properties(appp2pcom PROPERTIES
 target_link_libraries(appp2pcom
     PRIVATE Qt6::Quick
 )
-target_link_libraries(appp2pcom PRIVATE Qt6::Core)
-target_link_libraries(appp2pcom PRIVATE Qt6::Core)
 target_link_libraries(appp2pcom PRIVATE Qt6::Core)
 
 include(GNUInstallDirs)
