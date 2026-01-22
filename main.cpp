@@ -1,8 +1,11 @@
 #include <QGuiApplication>
 #include <QObject>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include "gui/addrlabel.h"
-#include "serverthread.h"
+#include "peer.h"
+#include "peerid.h"
+#include "server.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,8 +21,13 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<AddrLabel>("App", 1, 0, "AddrLabel");
 
-    ServerThread serverThread(&app);
-    serverThread.start();
+    QHash<PeerId, Peer *> ACTIVE_PEERS;
+
+    Server *server = new Server(&ACTIVE_PEERS, &app);
+    server->initTcpSocket();
+
+    QQmlContext *qmlContext = engine.rootContext();
+    qmlContext->setContextProperty("server", server);
 
     engine.loadFromModule("p2pcom", "Main");
 
