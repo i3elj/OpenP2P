@@ -1,11 +1,17 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import App
 
 Frame {
     Layout.fillHeight: true
     Layout.fillWidth: true
     padding: 8
+
+    required property Peer peer
+    required property ListModel peerModel
+
+    onPeerChanged: function () {}
 
     ColumnLayout {
         anchors.fill: parent
@@ -24,9 +30,16 @@ Frame {
                 text: model.text
                 wrapMode: Label.Wrap
                 width: chatList.width
+                horizontalAlignment: model.sent ? Qt.AlignRight : Qt.AlignLeft
             }
 
-            function addMessage(text) { msgModel.append({"text": text}) }
+            function addMessage(sent, text) {
+                let newMsg = {
+                    "sent": sent,
+                    "text": text
+                }
+                msgModel.append(newMsg)
+            }
         }
 
         RowLayout {
@@ -42,19 +55,24 @@ Frame {
                     id: msgInput
                     wrapMode: TextArea.Wrap
                     placeholderText: "Type your message here..."
+                    Keys.onReturnPressed: sendMessage()
+
+                    function sendMessage() {
+                        if (msgInput.text.length === 0) {
+                            return
+                        }
+
+                        chatList.addMessage(true, msgInput.text)
+                        chatList.positionViewAtEnd()
+                        msgInput.clear()
+                    }
                 }
             }
 
             Button {
                 text: "Send"
                 Layout.alignment: Qt.AlignTop
-
-                onClicked: function () {
-                    if (msgInput.text.length === 0) return
-                    chatList.addMessage(msgInput.text)
-                    msgInput.clear()
-                    chatList.positionViewAtEnd()
-                }
+                onClicked: msgInput.sendMessage()
             }
         }
     }

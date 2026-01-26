@@ -4,19 +4,25 @@ import QtQuick.Layouts
 import App
 
 ApplicationWindow {
-    id: appwindow
+    id: root
     minimumWidth: 920
     minimumHeight: 460
     visible: true
     title: qsTr("OpenP2P")
 
-    PeerConnection {
-        window: appwindow
+    property Peer currentPeer: null
+    property ListModel peers: ListModel {}
+
+    PeerConnectionNotification {
+        id: peerConn
+        root: root
+        peerModel: peers
     }
 
     RowLayout {
         anchors.fill: parent
         anchors.margins: 8
+        spacing: 32
 
         Pane {
             id: sidebar
@@ -24,30 +30,58 @@ ApplicationWindow {
             Layout.fillHeight: true
             Layout.minimumWidth: list.contentItem.childrenRect.width + (padding * 2)
 
-            ListView {
-                id: list
+            ColumnLayout {
                 anchors.fill: parent
-                spacing: 8
-                focus: true
-                clip: true
-                model: 3
-                delegate: Component {
-                    RowLayout {
-                        spacing: 4
-                        Layout.alignment: Qt.AlignCenter
-                        Rectangle {
-                            width: 40
-                            height: 40
-                            color: "blue"
-                        }
-                        Text {
-                            text: "Fulano de tal"
+                spacing: 12
+
+                Text {
+                    Layout.fillWidth: true
+                    text: "Saved Peers"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                ListView {
+                    id: list
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    spacing: 8
+                    focus: true
+                    clip: true
+                    model: root.peers
+                    delegate: Component {
+                        RowLayout {
+                            spacing: 4
+                            Layout.alignment: Qt.AlignCenter
+
+                            Rectangle {
+                                width: 40
+                                height: 40
+                                radius: 5
+                                color: "blue"
+                            }
+
+                            Text {
+                                text: model.name + " " + index
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                z: 0
+                                onEntered: function () {
+                                    list.currentIndex = index
+                                    this.cursorShape = Qt.PointingHandCursor
+                                }
+                                onClicked: function () {
+                                    currentPeer = index
+                                }
+                            }
                         }
                     }
-                }
-                highlight: Rectangle {
-                    color: "lightsteelblue"
-                    radius: 5
+                    highlight: Rectangle {
+                        color: "lightsteelblue"
+                        radius: 5
+                    }
                 }
             }
         }
@@ -102,7 +136,10 @@ ApplicationWindow {
                 }
             }
 
-            MessageHandler {}
+            MessageHandler {
+                peer: currentPeer
+                peerModel: peers
+            }
         }
     }
 }

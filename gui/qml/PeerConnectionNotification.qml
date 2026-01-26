@@ -1,16 +1,18 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import App
 
 Item {
-    required property ApplicationWindow window
+    required property ApplicationWindow root
+    required property ListModel peerModel
+    property Peer peer
 
     Connections {
         target: server
-        function onNewConnection(peer) {
-            newConnDialog.peerName = "Fulano"
-            newConnDialog.peerAddrs = peer.addrStr
-            newConnDialog.peerPort = peer.port
+        function onNewConnection(p) {
+            peer = p
+            peer.name = "Fulano"
             newConnDialog.open()
         }
     }
@@ -19,18 +21,14 @@ Item {
         id: newConnDialog
         title: "New Connection Request!"
         width: 580
-        x: window.width - width - 32
-        y: window.height - height - 76
-
-        property string peerName
-        property string peerAddrs
-        property int peerPort
+        x: root.width - width - 32
+        y: root.height - height - 76
 
         contentItem: ColumnLayout {
             spacing: 12
 
             Label {
-                text: newConnDialog.peerName + " wants to connect with you."
+                text: peer ? peer.name + " wants to connect with you." : ""
                 wrapMode: Label.Wrap
                 Layout.fillWidth: true
             }
@@ -44,7 +42,7 @@ Item {
                     text: "Address:"
                 }
                 Label {
-                    text: newConnDialog.peerAddrs
+                    text: peer ? peer.addrStr : ""
                     Layout.fillWidth: true
                     wrapMode: Label.Wrap
                 }
@@ -52,7 +50,7 @@ Item {
                     text: "Port Number:"
                 }
                 Label {
-                    text: newConnDialog.peerPort
+                    text: peer ? peer.port : ""
                 }
             }
         }
@@ -60,10 +58,12 @@ Item {
         footer: DialogButtonBox {
             standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
 
-            onAccepted: server.setupPeer(newConnDialog.peerAddrs,
-                                         newConnDialog.peerPort)
-            onRejected: server.rejectPeer(newConnDialog.peerAddrs,
-                                          newConnDialog.peerPort)
+            onAccepted: function () {
+                server.setupPeer(peer)
+                peerModel.append(peer)
+            }
+
+            onRejected: server.rejectPeer(peer)
         }
     }
 }
