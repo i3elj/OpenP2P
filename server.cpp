@@ -36,18 +36,16 @@ void Server::handleNewConnection()
     emit newConnection(peer);
 }
 
-void Server::setupPeer(QString addrs, int port)
+void Server::setupPeer(Peer *peer)
 {
-    std::println("accepted: {} {}", addrs.toStdString(), port);
-    Peer *peer = activePeers->value(PeerId{.addr = QHostAddress(addrs), .port = port});
+    std::println("accepted: {} {}", peer->addrStr.toStdString(), peer->port);
     peer->setup();
 }
 
-void Server::rejectPeer(QString addrs, int port)
+void Server::rejectPeer(Peer *peer)
 {
-    std::println("rejected: {} {}", addrs.toStdString(), port);
-    PeerId id = PeerId{.addr = QHostAddress(addrs), .port = port};
-    Peer *peer = activePeers->value(id);
+    std::println("rejected: {} {}", peer->addrStr.toStdString(), peer->port);
+    PeerId id = PeerId{.addr = peer->addr, .port = peer->port};
     activePeers->remove(id);
     peer->close();
     peer->deleteLater();

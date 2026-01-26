@@ -22,8 +22,8 @@ public:
 public slots:
     void initTcpSocket();
     void handleNewConnection();
-    void setupPeer(QString addrs, int port);
-    void rejectPeer(QString addrs, int port);
+    void setupPeer(Peer *peer);
+    void rejectPeer(Peer *peer);
 
 signals:
     void newConnection(Peer *peer);
