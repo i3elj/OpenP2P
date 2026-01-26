@@ -1,0 +1,5 @@
+TODO:
+1. [ ] make client chat box work with nc
+2. [ ] make changing peers chat work
+2.1. [ ] save chat in file
+2.2. [ ] revert it
