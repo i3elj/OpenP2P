@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
 
+    qmlRegisterType<Peer>("App", 1, 0, "Peer");
     qmlRegisterType<AddrLabel>("App", 1, 0, "AddrLabel");
 
     QHash<PeerId, Peer *> ACTIVE_PEERS;
