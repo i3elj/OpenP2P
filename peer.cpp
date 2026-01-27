@@ -1,5 +1,5 @@
 #include "peer.h"
-#include <print>
+#include <iostream>
 
 Peer::Peer(QTcpSocket* conn, QObject* parent)
     : QObject{parent}
@@ -25,5 +25,5 @@ void Peer::close()
 void Peer::handle()
 {
     QByteArray data = conn->readAll();
-    std::println("{}", data.toStdString());
+    std::cout << std::format("{}", data.toStdString());
 }

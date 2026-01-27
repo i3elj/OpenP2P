@@ -3,7 +3,7 @@
 #include <QNetworkDatagram>
 #include <QTcpSocket>
 #include "peer.h"
-#include <print>
+#include <iostream>
 
 Server::Server(QHash<PeerId, Peer *> *activePeers, QObject *parent)
     : QTcpServer{parent}
@@ -38,13 +38,13 @@ void Server::handleNewConnection()
 
 void Server::setupPeer(Peer *peer)
 {
-    std::println("accepted: {} {}", peer->addrStr.toStdString(), peer->port);
+    std::cout << std::format("accepted: {} {}", peer->addrStr.toStdString(), peer->port);
     peer->setup();
 }
 
 void Server::rejectPeer(Peer *peer)
 {
-    std::println("rejected: {} {}", peer->addrStr.toStdString(), peer->port);
+    std::cout << std::format("rejected: {} {}", peer->addrStr.toStdString(), peer->port);
     PeerId id = PeerId{.addr = peer->addr, .port = peer->port};
     activePeers->remove(id);
     peer->close();
