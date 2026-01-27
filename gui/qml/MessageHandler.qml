@@ -11,7 +11,9 @@ Frame {
     required property Peer peer
     required property ListModel peerModel
 
-    onPeerChanged: function () {}
+    onPeerChanged: function () {
+        console.warn("hello")
+    }
 
     ColumnLayout {
         anchors.fill: parent

@@ -60,7 +60,7 @@ Item {
 
             onAccepted: function () {
                 server.setupPeer(peer)
-                peerModel.append(peer)
+                peerModel.append({ "peer": peer }   )
             }
 
             onRejected: server.rejectPeer(peer)

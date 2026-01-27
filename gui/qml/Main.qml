@@ -73,7 +73,7 @@ ApplicationWindow {
                                     this.cursorShape = Qt.PointingHandCursor
                                 }
                                 onClicked: function () {
-                                    currentPeer = index
+                                    currentPeer = peers.get(index).peer
                                 }
                             }
                         }
