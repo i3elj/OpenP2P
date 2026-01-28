@@ -10,6 +10,7 @@ Item {
 
     Connections {
         target: server
+
         function onNewConnection(p) {
             peer = p
             peer.name = "Fulano"

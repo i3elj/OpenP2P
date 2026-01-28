@@ -3,3 +3,11 @@ TODO:
 2. [ ] make changing peers chat work
 2.1. [ ] save chat in file
 2.2. [ ] revert it
+
+Notes:
+Peer's ListView can totally have a Peer{} component that
+just:
+>  onNewMsg: function() {}
+
+but how can the Peer{} component keep track of which peer
+to use?

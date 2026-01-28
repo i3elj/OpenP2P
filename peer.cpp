@@ -1,14 +1,15 @@
 #include "peer.h"
 #include <iostream>
 
-Peer::Peer(QTcpSocket* conn, QObject* parent)
+Peer::Peer(QTcpSocket* conn, PeerId id, QObject* parent)
     : QObject{parent}
+    , id(id)
+    , conn(conn)
 {
-    this->conn = conn;
     this->conn->setParent(this);
-    addr = conn->peerAddress();
+    addr = this->conn->peerAddress();
     addrStr = addr.toString();
-    port = conn->peerPort();
+    port = this->conn->peerPort();
 }
 
 void Peer::setup()
@@ -26,4 +27,5 @@ void Peer::handle()
 {
     QByteArray data = conn->readAll();
     std::cout << std::format("{}", data.toStdString());
+    emit newMsg(this);
 }

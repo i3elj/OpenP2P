@@ -13,7 +13,7 @@ ApplicationWindow {
     property Peer currentPeer: null
     property ListModel peers: ListModel {}
 
-    PeerConnectionNotification {
+    PeerConnection {
         id: peerConn
         root: root
         peerModel: peers

@@ -1,11 +1,10 @@
 #include "gui/addrlabel.h"
-#include <QThread>
 
 AddrLabel::AddrLabel(QObject *parent)
     : QObject{parent}
+    , ipr(new IPv6AddrResolver(this))
+    , thread(new QThread(this))
 {
-    ipr = new IPv6AddrResolver();
-    thread = new QThread(this);
     ipr->moveToThread(thread);
 
     connect(thread, &QThread::started, ipr, &IPv6AddrResolver::resolve);

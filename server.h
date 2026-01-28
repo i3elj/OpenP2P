@@ -27,6 +27,7 @@ public slots:
 
 signals:
     void newConnection(Peer *peer);
+    void newMsg(Peer *peer);
 };
 
 #endif // SERVER_H

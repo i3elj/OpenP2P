@@ -2,6 +2,7 @@
 #define ADDRLABEL_H
 
 #include <QObject>
+#include <QThread>
 #include "ipv6addrresolver.h"
 
 class AddrLabel : public QObject

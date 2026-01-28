@@ -8,11 +8,25 @@ Frame {
     Layout.fillWidth: true
     padding: 8
 
+    property Peer prevPeer
     required property Peer peer
     required property ListModel peerModel
 
     onPeerChanged: function () {
-        console.warn("hello")
+        sessionManager.saveChatHistory(prevPeer, msgModel);
+        let messages = sessionManager.loadChatHistory(peer)
+        msgModel.set(messages)
+        prevPeer = peer
+    }
+
+    Connections {
+        id: conn
+        target: server
+    }
+
+    Connections {
+        id: sessionManager
+        target: sessionManager
     }
 
     ColumnLayout {

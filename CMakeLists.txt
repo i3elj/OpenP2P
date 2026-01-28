@@ -18,7 +18,7 @@ qt_add_qml_module(appp2pcom
     URI p2pcom
     QML_FILES gui/qml/Main.qml
     QML_FILES gui/qml/MessageHandler.qml
-    QML_FILES gui/qml/PeerConnectionNotification.qml
+    QML_FILES gui/qml/PeerConnection.qml
     SOURCES gui/addrlabel.h gui/addrlabel.cpp
     SOURCES ipv6addrresolver.h ipv6addrresolver.cpp
     SOURCES server.h server.cpp

@@ -24,11 +24,14 @@ int main(int argc, char *argv[])
 
     QHash<PeerId, Peer *> ACTIVE_PEERS;
 
-    Server *server = new Server(&ACTIVE_PEERS, &app);
-    server->initTcpSocket();
+    // SessionManager sm(&app);
+
+    Server server(&ACTIVE_PEERS, &app);
+    server.initTcpSocket();
 
     QQmlContext *qmlContext = engine.rootContext();
-    qmlContext->setContextProperty("server", server);
+    qmlContext->setContextProperty("server", &server);
+    // qmlContext->setContextProperty("sessionManager", sm);
 
     engine.loadFromModule("p2pcom", "Main");
 
