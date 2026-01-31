@@ -4,92 +4,105 @@ import QtQuick.Layouts
 import App
 
 Frame {
-    Layout.fillHeight: true
-    Layout.fillWidth: true
-    padding: 8
+	Layout.fillHeight: true
+	Layout.fillWidth: true
+	padding: 8
+	visible: peer !== null
 
-    property Peer prevPeer
-    required property Peer peer
-    required property ListModel peerModel
+	property Peer prevPeer
+	required property Peer peer
+	required property ListModel peerModel
 
-    onPeerChanged: function () {
-        sessionManager.saveChatHistory(prevPeer, msgModel);
-        let messages = sessionManager.loadChatHistory(peer)
-        msgModel.set(messages)
-        prevPeer = peer
-    }
+	onPeerChanged: function () {
+		if (peer !== null) {
+			// peerManager.saveChatHistory(prevPeer, msgModel)
+			// let messages = peerManager.loadChatHistory(peer)
+			// msgModel.set(messages)
+			prevPeer = peer
+		}
+	}
 
-    Connections {
-        id: conn
-        target: server
-    }
+	Connections {
+		id: conn
+		target: server
+		function onNewMsg(from, msg) {
+			let newMsg = {"sent": false,"text": msg}
 
-    Connections {
-        id: sessionManager
-        target: sessionManager
-    }
+			if (from === peer) {
+				msgModel.append(newMsg)
+				console.log(msg)
+			} else {
+				// peerManager.addNewMsg(from, newMsg)
+			}
+		}
+	}
 
-    ColumnLayout {
-        anchors.fill: parent
+	Connections {
+		id: sessionManager
+		target: sessionManager
+	}
 
-        ListView {
-            id: chatList
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            clip: true
+	ColumnLayout {
+		anchors.fill: parent
 
-            model: ListModel {
-                id: msgModel
-            }
+		ListView {
+			id: chatList
+			Layout.fillHeight: true
+			Layout.fillWidth: true
+			clip: true
 
-            delegate: Label {
-                text: model.text
-                wrapMode: Label.Wrap
-                width: chatList.width
-                horizontalAlignment: model.sent ? Qt.AlignRight : Qt.AlignLeft
-            }
+			model: ListModel {
+				id: msgModel
+			}
 
-            function addMessage(sent, text) {
-                let newMsg = {
-                    "sent": sent,
-                    "text": text
-                }
-                msgModel.append(newMsg)
-            }
-        }
+			delegate: Label {
+				text: model.text
+				wrapMode: Label.Wrap
+				width: chatList.width
+				horizontalAlignment: model.sent ? Qt.AlignRight : Qt.AlignLeft
+			}
 
-        RowLayout {
-            width: parent.width
+			function addMessage(sent, text) {
+				let newMsg = {
+					"sent": sent,
+					"text": text
+				}
+				msgModel.append(newMsg)
+			}
+		}
 
-            ScrollView {
-                Layout.alignment: Qt.AlignTop
-                Layout.maximumHeight: 200
-                Layout.fillWidth: true
-                Layout.minimumHeight: 36
+		RowLayout {
+			width: parent.width
 
-                TextArea {
-                    id: msgInput
-                    wrapMode: TextArea.Wrap
-                    placeholderText: "Type your message here..."
-                    Keys.onReturnPressed: sendMessage()
+			ScrollView {
+				Layout.alignment: Qt.AlignTop
+				Layout.maximumHeight: 200
+				Layout.fillWidth: true
+				Layout.minimumHeight: 36
 
-                    function sendMessage() {
-                        if (msgInput.text.length === 0) {
-                            return
-                        }
+				TextArea {
+					id: msgInput
+					wrapMode: TextArea.Wrap
+					placeholderText: "Type your message here..."
+					Keys.onReturnPressed: sendMessage()
 
-                        chatList.addMessage(true, msgInput.text)
-                        chatList.positionViewAtEnd()
-                        msgInput.clear()
-                    }
-                }
-            }
+					function sendMessage() {
+						if (msgInput.text.length === 0) {
+							return
+						}
 
-            Button {
-                text: "Send"
-                Layout.alignment: Qt.AlignTop
-                onClicked: msgInput.sendMessage()
-            }
-        }
-    }
+						chatList.addMessage(true, msgInput.text)
+						chatList.positionViewAtEnd()
+						msgInput.clear()
+					}
+				}
+			}
+
+			Button {
+				text: "Send"
+				Layout.alignment: Qt.AlignTop
+				onClicked: msgInput.sendMessage()
+			}
+		}
+	}
 }
