@@ -2,7 +2,7 @@
 
 AddrLabel::AddrLabel(QObject *parent)
     : QObject{parent}
-    , ipr(new IPv6AddrResolver(this))
+    , ipr(new IPv6AddrResolver())
     , thread(new QThread(this))
 {
     ipr->moveToThread(thread);
