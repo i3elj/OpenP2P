@@ -23,15 +23,31 @@ Frame {
 	}
 
 	Connections {
-		id: conn
+		target: peer
+		function onNewMsg(from, msg) {
+			console.warn("received:", msg)
+		}
+
+		function onMsgSent(msg) {
+			chatList.addMessage(true, msg)
+			chatList.positionViewAtEnd()
+			msgInput.clear()
+		}
+	}
+
+	Connections {
 		target: server
 		function onNewMsg(from, msg) {
-			let newMsg = {"sent": false,"text": msg}
+			let newMsg = {
+				"sent": false,
+				"text": msg
+			}
 
 			if (from === peer) {
 				msgModel.append(newMsg)
 				console.log(msg)
 			} else {
+
 				// peerManager.addNewMsg(from, newMsg)
 			}
 		}
@@ -91,6 +107,8 @@ Frame {
 							return
 						}
 
+						// TODO: workout the `me` sending a msg to `peer`
+						// peer.sendMsg(msgInput.text)
 						chatList.addMessage(true, msgInput.text)
 						chatList.positionViewAtEnd()
 						msgInput.clear()
