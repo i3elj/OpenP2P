@@ -1,13 +1,7 @@
 TODO:
-1. [ ] make client chat box work with nc
+1. [X] make client chat box work with nc
+1.1. [X] sending message and receiving architecture
+1.2. [X] actually send the message using tcp socket
 2. [ ] make changing peers chat work
 2.1. [ ] save chat in file
 2.2. [ ] revert it
-
-Notes:
-Peer's ListView can totally have a Peer{} component that
-just:
->  onNewMsg: function() {}
-
-but how can the Peer{} component keep track of which peer
-to use?
