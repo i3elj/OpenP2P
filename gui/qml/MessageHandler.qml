@@ -28,26 +28,21 @@ Frame {
 			console.warn("received:", msg)
 		}
 
-		function onMsgSent(msg) {
-			chatList.addMessage(true, msg)
-			chatList.positionViewAtEnd()
-			msgInput.clear()
+		function onMsgSent(to, msg, success) {
+			if (to === peer) {
+				console.warn("message sent succesfully? ", success)
+				chatList.addMessage(true, msg)
+			}
 		}
 	}
 
 	Connections {
 		target: server
 		function onNewMsg(from, msg) {
-			let newMsg = {
-				"sent": false,
-				"text": msg
-			}
-
 			if (from === peer) {
-				msgModel.append(newMsg)
+				chatList.addMessage(false, msg)
 				console.log(msg)
 			} else {
-
 				// peerManager.addNewMsg(from, newMsg)
 			}
 		}
@@ -84,6 +79,7 @@ Frame {
 					"text": text
 				}
 				msgModel.append(newMsg)
+				chatList.positionViewAtEnd()
 			}
 		}
 
@@ -107,10 +103,7 @@ Frame {
 							return
 						}
 
-						// TODO: workout the `me` sending a msg to `peer`
-						// peer.sendMsg(msgInput.text)
-						chatList.addMessage(true, msgInput.text)
-						chatList.positionViewAtEnd()
+						peer.sendMsg(msgInput.text)
 						msgInput.clear()
 					}
 				}

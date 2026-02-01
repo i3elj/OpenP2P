@@ -17,10 +17,7 @@ void Peer::close() {
 	m_conn->abort();
 }
 
-PeerId Peer::id() const
-{
-	return PeerId{.addr = m_addr, .port = m_port};
-}
+PeerId Peer::id() const { return PeerId{.addr = m_addr, .port = m_port}; }
 
 QString Peer::addr() const { return m_addr.toString(); }
 
@@ -33,6 +30,11 @@ void Peer::setName(QString n) {
 		return;
 	m_name = n;
 	emit nameChanged();
+}
+
+void Peer::sendMsg(QString msg) {
+	qint64 bytes = m_conn->write(QByteArray::fromStdString(msg.toStdString()));
+	emit msgSent(this, msg, bytes != -1);
 }
 
 void Peer::handle() {

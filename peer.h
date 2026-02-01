@@ -19,7 +19,6 @@ private:
 	int m_port;
 	QString m_name;
 
-
 public:
 	explicit Peer(QTcpSocket *conn, PeerId id, QObject *parent = nullptr);
 	void setup();
@@ -30,12 +29,15 @@ public:
 	QString name() const;
 	void setName(QString n);
 
+	Q_INVOKABLE void sendMsg(QString msg);
+
 public slots:
 	void handle();
 
 signals:
 	void nameChanged();
 	void newMsg(Peer *from, QString msg);
+	void msgSent(Peer *to, QString msg, bool success);
 };
 
 #endif // PEER_H
