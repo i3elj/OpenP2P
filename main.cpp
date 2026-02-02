@@ -6,34 +6,35 @@
 #include "peer.h"
 #include "peerid.h"
 #include "server.h"
+#include "sessionmanager.h"
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+		QGuiApplication app(argc, argv);
 
-    QQmlApplicationEngine engine;
-    QObject::connect(
-        &engine,
-        &QQmlApplicationEngine::objectCreationFailed,
-        &app,
-        []() { QCoreApplication::exit(-1); },
-        Qt::QueuedConnection);
+		QQmlApplicationEngine engine;
+		QObject::connect(
+				&engine,
+				&QQmlApplicationEngine::objectCreationFailed,
+				&app,
+				[]() { QCoreApplication::exit(-1); },
+				Qt::QueuedConnection);
 
-    qmlRegisterType<Peer>("App", 1, 0, "Peer");
-    qmlRegisterType<AddrLabel>("App", 1, 0, "AddrLabel");
+		qmlRegisterType<Peer>("App", 1, 0, "Peer");
+		qmlRegisterType<AddrLabel>("App", 1, 0, "AddrLabel");
 
-    QHash<PeerId, Peer *> ACTIVE_PEERS;
+		QHash<PeerId, Peer *> ACTIVE_PEERS;
 
-    // SessionManager sm(&app);
+		SessionManager sm(&app);
 
-    Server server(&ACTIVE_PEERS, &app);
-    server.initTcpSocket();
+		Server server(&ACTIVE_PEERS, &app);
+		server.initTcpSocket();
 
-    QQmlContext *qmlContext = engine.rootContext();
-    qmlContext->setContextProperty("server", &server);
-    // qmlContext->setContextProperty("sessionManager", sm);
+		QQmlContext *qmlContext = engine.rootContext();
+		qmlContext->setContextProperty("server", &server);
+		qmlContext->setContextProperty("sessionManager", &sm);
 
-    engine.loadFromModule("p2pcom", "Main");
+		engine.loadFromModule("p2pcom", "Main");
 
-    return app.exec();
+		return app.exec();
 }

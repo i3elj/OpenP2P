@@ -15,7 +15,8 @@ Frame {
 
 	onPeerChanged: function () {
 		if (peer !== null) {
-			// peerManager.saveChatHistory(prevPeer, msgModel)
+			sessionManager.saveChat(prevPeer, msgModel)
+			// sessionManager.saveChatHistory(prevPeer, msgModel)
 			// let messages = peerManager.loadChatHistory(peer)
 			// msgModel.set(messages)
 			prevPeer = peer
@@ -24,6 +25,7 @@ Frame {
 
 	Connections {
 		target: peer
+
 		function onNewMsg(from, msg) {
 			console.warn("received:", msg)
 		}
@@ -46,11 +48,6 @@ Frame {
 				// peerManager.addNewMsg(from, newMsg)
 			}
 		}
-	}
-
-	Connections {
-		id: sessionManager
-		target: sessionManager
 	}
 
 	ColumnLayout {
