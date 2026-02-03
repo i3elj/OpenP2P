@@ -27,6 +27,7 @@ qt_add_qml_module(appp2pcom
     SOURCES peerid.h
     RESOURCES todo
     SOURCES sessionmanager.h sessionmanager.cpp
+    SOURCES message.h
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
