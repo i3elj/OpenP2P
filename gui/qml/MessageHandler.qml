@@ -14,13 +14,18 @@ Frame {
 	required property ListModel peerModel
 
 	onPeerChanged: function () {
+		if (prevPeer === null) {
+			prevPeer = peer
+		}
+
 		if (peer !== null) {
 			sessionManager.saveChat(prevPeer, msgModel)
 			// sessionManager.saveChatHistory(prevPeer, msgModel)
 			// let messages = peerManager.loadChatHistory(peer)
 			// msgModel.set(messages)
-			prevPeer = peer
 		}
+
+		prevPeer = peer
 	}
 
 	Connections {
@@ -73,7 +78,7 @@ Frame {
 			function addMessage(sent, text) {
 				let newMsg = {
 					"sent": sent,
-					"text": text
+					"text": !text.endsWith("\n") ? text + "\n" : text
 				}
 				msgModel.append(newMsg)
 				chatList.positionViewAtEnd()
