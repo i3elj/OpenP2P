@@ -1,7 +1,9 @@
 TODO:
-1. [X] make client chat box work with nc
-1.1. [X] sending message and receiving architecture
-1.2. [X] actually send the message using tcp socket
-2. [ ] make changing peers chat work
-2.1. [-] save chat in file
-2.2. [ ] revert it
+1 [X] make client chat box work with nc
+1.1  [X] sending message and receiving architecture
+1.2  [X] actually send the message using tcp socket
+
+2 [-] make changing peers chat work
+2.1  [X] save chat in file
+2.2  [ ] clean the chat
+2.3  [ ] revert it
