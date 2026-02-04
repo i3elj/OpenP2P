@@ -9,11 +9,11 @@ class SessionManager : public QObject
 {
   Q_OBJECT
 
-  public:
+public:
   explicit SessionManager(QObject *parent = nullptr);
   Q_INVOKABLE void saveChat(Peer *peer, QAbstractListModel *msgModel);
 
-  signals:
+signals:
 };
 
 #endif // SESSIONMANAGER_H

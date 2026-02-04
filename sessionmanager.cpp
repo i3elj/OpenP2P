@@ -1,5 +1,6 @@
 #include "sessionmanager.h"
 #include <QBuffer>
+#include <QDir>
 #include <QFile>
 #include "message.h"
 
@@ -22,16 +23,26 @@ void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel)
   }
 
   // save chat to file
-  QFile file("~/OpenP2P/chats/" + peer->name());
+  QString path = QDir::homePath() + "/OpenP2P/chats/";
+  QDir dir(path);
+
+  if (!dir.exists(path) && dir.isReadable()) {
+    dir.mkpath(path);
+  }
+
+  QFile file(path + peer->name());
 
   if (!file.open(QIODevice::WriteOnly)) {
     qErrnoWarning("Can't open file");
     return;
   }
 
-  QBuffer buf;
-  buf.open(QBuffer::WriteOnly);
-  for (auto msg : chat) {
-    // buf.write(std::format("{} {}", msg.sent, msg.data.toStdString()));
+  std::string buffer;
+
+  for (const Message &msg : chat) {
+    buffer += std::format("{} {}", msg.sent, msg.data.toStdString());
   }
+
+  file.write(buffer.data());
+  file.close();
 }
