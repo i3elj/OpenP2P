@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import App
 
 Item {
+	id: item
 	property Peer peer
 	required property ApplicationWindow root
 	required property ListModel peerModel
@@ -12,8 +13,8 @@ Item {
 		target: server
 
 		function onNewConnection(p) {
-			peer = p
-			peer.name = "Fulano"
+			item.peer = p
+			item.peer.name = "Fulano"
 			newConnDialog.open()
 		}
 	}
@@ -29,7 +30,7 @@ Item {
 			spacing: 12
 
 			Label {
-				text: peer ? peer.name + " wants to connect with you." : ""
+				text: item.peer ? item.peer.name + " wants to connect with you." : ""
 				wrapMode: Label.Wrap
 				Layout.fillWidth: true
 			}
@@ -43,7 +44,7 @@ Item {
 					text: "Address:"
 				}
 				Label {
-					text: peer ? peer.addr : ""
+					text: item.peer ? item.peer.addr : ""
 					Layout.fillWidth: true
 					wrapMode: Label.Wrap
 				}
@@ -51,7 +52,7 @@ Item {
 					text: "Port Number:"
 				}
 				Label {
-					text: peer ? peer.port : ""
+					text: item.peer ? item.peer.port : ""
 				}
 			}
 		}
@@ -60,11 +61,11 @@ Item {
 			standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
 
 			onAccepted: function () {
-				server.setupPeer(peer)
-				peerModel.append({"peer": peer})
+				server.setupPeer(item.peer)
+				peerModel.append({"peer": item.peer})
 			}
 
-			onRejected: server.rejectPeer(peer)
+			onRejected: server.rejectPeer(item.peer)
 		}
 	}
 }
