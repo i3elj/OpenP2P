@@ -90,7 +90,8 @@ ApplicationWindow {
 			Layout.fillWidth: true
 			spacing: 8
 
-			Row {
+			RowLayout {
+				id: selfIpSection
 				spacing: 12
 
 				Label {
@@ -124,10 +125,30 @@ ApplicationWindow {
 			}
 
 			RowLayout {
+				id: selfNameSection
+				spacing: 12
+
+				Label {
+					text: "Your Name:"
+				}
+
+				TextField {
+					id: selfName
+					placeholderText: "Jack Sparrow"
+					text: self.name
+					width: 230
+
+					// todo: save name once changed
+				}
+			}
+
+			RowLayout {
+				id: peerIpSection
+
 				TextField {
 					id: peerIP
 					placeholderText: "Peer's IP"
-					width: 230
+					Layout.fillWidth: true
 				}
 
 				Button {

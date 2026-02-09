@@ -23,8 +23,8 @@ public:
 	explicit Peer(QTcpSocket *conn, PeerId id, QObject *parent = nullptr);
 	void setup();
 	void close();
-	PeerId id() const;
-	QString addr() const;
+  PeerId id() const;
+  QString addr() const;
 	int port() const;
 	QString name() const;
 	void setName(QString n);

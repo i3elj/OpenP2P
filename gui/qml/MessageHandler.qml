@@ -20,9 +20,12 @@ Frame {
 
 		if (peer !== null) {
 			sessionManager.saveChat(prevPeer, msgModel)
-			// sessionManager.saveChatHistory(prevPeer, msgModel)
-			// let messages = peerManager.loadChatHistory(peer)
-			// msgModel.set(messages)
+			let messages = sessionManager.loadChat(peer)
+			msgModel.clear()
+
+			if (messages.length > 0) {
+				msgModel.append(messages)
+			}
 		}
 
 		prevPeer = peer
@@ -31,13 +34,8 @@ Frame {
 	Connections {
 		target: peer
 
-		function onNewMsg(from, msg) {
-			console.warn("received:", msg)
-		}
-
 		function onMsgSent(to, msg, success) {
 			if (to === peer) {
-				console.warn("message sent succesfully? ", success)
 				chatList.addMessage(true, msg)
 			}
 		}
@@ -48,7 +46,6 @@ Frame {
 		function onNewMsg(from, msg) {
 			if (from === peer) {
 				chatList.addMessage(false, msg)
-				console.log(msg)
 			} else {
 				// peerManager.addNewMsg(from, newMsg)
 			}

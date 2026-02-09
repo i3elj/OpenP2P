@@ -1,12 +1,12 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include <qstring.h>
+#include <QString>
 
 struct Message
 {
-	bool sent;
-	QString data;
+  bool sent;
+  QString text;
 };
 
 #endif // MESSAGE_H

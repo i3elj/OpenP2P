@@ -2,40 +2,39 @@
 #include <QNetworkInterface>
 
 IPv6AddrResolver::IPv6AddrResolver(QObject *parent)
-    : QObject{parent}
+  : QObject{parent}
 {}
 
-QList<QHostAddress> IPv6AddrResolver::resolve()
+AddressList IPv6AddrResolver::resolve()
 {
-    QList<QHostAddress> list;
-    QStringList emittedList;
+  AddressList list;
+  QStringList emittedList;
 
-    for (const QNetworkInterface &iface : QNetworkInterface::allInterfaces()) {
-        auto flags = iface.flags();
+  for (const QNetworkInterface &iface : QNetworkInterface::allInterfaces()) {
+    auto flags = iface.flags();
 
-        if (!(flags & QNetworkInterface::IsUp) || !(flags & QNetworkInterface::IsRunning)) {
-            continue;
-        }
-
-        for (const QNetworkAddressEntry &entry : iface.addressEntries()) {
-            QHostAddress addr = entry.ip();
-            bool isNotLocal = !addr.isLinkLocal();
-            bool isIPv6 = addr.protocol() == QAbstractSocket::IPv6Protocol;
-
-            if (isIPv6 && isNotLocal && addr.toString() != "::1") {
-                list.append(addr);
-            }
-        }
+    if (!(flags & QNetworkInterface::IsUp) || !(flags & QNetworkInterface::IsRunning)) {
+      continue;
     }
 
-    emittedList.reserve(list.size());
+    for (const QNetworkAddressEntry &entry : iface.addressEntries()) {
+      QHostAddress addr = entry.ip();
+      bool isNotLocal = !addr.isLinkLocal();
+      bool isIPv6 = addr.protocol() == QAbstractSocket::IPv6Protocol;
 
-    std::transform(list.begin(),
-                   list.end(),
-                   std::back_inserter(emittedList),
-                   [](const QHostAddress &a) { return a.toString(); });
+      if (isIPv6 && isNotLocal && addr.toString() != "::1") {
+        list.append(addr);
+      }
+    }
+  }
 
-    emit finished(emittedList);
+  emittedList.reserve(list.size());
+  std::transform(list.begin(),
+                 list.end(),
+                 std::back_inserter(emittedList),
+                 [](const QHostAddress &a) { return a.toString(); });
 
-    return list;
+  emit finished(emittedList);
+
+  return list;
 }

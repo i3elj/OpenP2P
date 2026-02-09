@@ -1,22 +1,22 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "ipv6addrresolver.h"
-#include "peer.h"
-#include "peerid.h"
 #include <QTcpServer>
 #include <QThread>
+#include "ipv6addrresolver.h"
+#include "peer.h"
+#include "sessionmanager.h"
 
 class Server : public QTcpServer {
 	Q_OBJECT
 
 private:
-	IPv6AddrResolver *ipr;
-	QHash<PeerId, Peer *> *activePeers;
+  IPv6AddrResolver *m_ipr;
+  SessionManager *m_session;
 
 public:
-	Server(QHash<PeerId, Peer *> *activePeers, QObject *parent = nullptr);
-	~Server();
+  Server(SessionManager *sm, QObject *parent = nullptr);
+  ~Server();
 
 public slots:
 	void initTcpSocket();

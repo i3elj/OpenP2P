@@ -2,6 +2,7 @@
 #define PEERID_H
 
 #include <QHostAddress>
+#include <QTcpSocket>
 
 struct PeerId
 {
@@ -9,6 +10,12 @@ struct PeerId
     int port;
 
     bool operator==(const PeerId &o) const { return addr == o.addr && port == o.port; }
+
+    explicit PeerId(QTcpSocket *conn)
+    {
+      addr = conn->peerAddress();
+      port = conn->peerPort();
+    }
 };
 
 inline uint qHash(const PeerId &key, uint seed = 0)
