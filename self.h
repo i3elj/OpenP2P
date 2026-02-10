@@ -3,8 +3,8 @@
 
 #include <QHostAddress>
 #include <QObject>
-#include <config.h>
-#include <typedefs.h>
+#include <QSettings>
+#include "typedefs.h"
 
 class Self : public QObject
 {
@@ -14,10 +14,10 @@ class Self : public QObject
 private:
   QString m_name;
   AddressList m_ipv6list;
-  Config *m_config;
+  QSettings *m_settings;
 
 public:
-  explicit Self(Config *cfg, QObject *parent = nullptr);
+  explicit Self(QObject *parent = nullptr);
   QString name() const;
   void setName(QString newName);
 

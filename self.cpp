@@ -3,23 +3,22 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include "config.h"
 
-Self::Self(Config *cfg, QObject *parent)
+Self::Self(QObject *parent)
   : QObject{parent}
-  , m_config(cfg)
   , m_name("")
+  , m_settings(new QSettings(this))
 {}
 
 QString Self::name() const
 {
-  return m_name;
+  return m_name == "" ? m_settings->value("name", "").toString() : m_name;
 }
 
-void Self::setName(QString newName)
-{
+void Self::setName(QString newName) {
   if (m_name != newName) {
     m_name = newName;
+    m_settings->setValue("name", m_name);
     emit nameChanged();
   }
 }

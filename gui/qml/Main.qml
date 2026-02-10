@@ -105,9 +105,7 @@ ApplicationWindow {
 
 					AddrLabel {
 						id: addrLabel
-						onIpsReceived: function (ips) {
-							ipList.ipModel = ips
-						}
+						onIpsReceived: (ips) => ipList.ipModel = ips
 					}
 
 					Repeater {
@@ -135,10 +133,12 @@ ApplicationWindow {
 				TextField {
 					id: selfName
 					placeholderText: "Jack Sparrow"
-					text: self.name
-					width: 230
+					Component.onCompleted: text = self.name
+				}
 
-					// todo: save name once changed
+				Button {
+					text: "Save"
+					onClicked: self.name = selfName.text
 				}
 			}
 

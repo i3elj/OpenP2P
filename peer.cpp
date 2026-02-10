@@ -1,10 +1,12 @@
 #include "peer.h"
-#include <iostream>
+#include <QJsonObject>
+#include "self.h"
 
-Peer::Peer(QTcpSocket *conn, PeerId id, QObject *parent)
+Peer::Peer(Self *user, QTcpSocket *conn, PeerId id, QObject *parent)
   : QObject{parent}
   , m_id(id)
   , m_conn(conn)
+  , m_user(user)
 {
   m_conn->setParent(this);
   m_addr = m_conn->peerAddress();
@@ -22,13 +24,25 @@ void Peer::close()
   m_conn->abort();
 }
 
-PeerId Peer::id() const { return m_id; }
+PeerId Peer::id() const
+{
+  return m_id;
+}
 
-QString Peer::addr() const { return m_addr.toString(); }
+QString Peer::addr() const
+{
+  return m_addr.toString();
+}
 
-int Peer::port() const { return m_port; }
+int Peer::port() const
+{
+  return m_port;
+}
 
-QString Peer::name() const { return m_name; }
+QString Peer::name() const
+{
+  return m_name;
+}
 
 void Peer::setName(QString n)
 {
@@ -40,13 +54,13 @@ void Peer::setName(QString n)
 
 void Peer::sendMsg(QString msg)
 {
-  qint64 bytes = m_conn->write(QByteArray::fromStdString(msg.toStdString()));
+  QJsonObject payload{{"name", m_user->name()}, {"data", msg}};
+  qint64 bytes = m_conn->write(QJsonDocument(payload).toJson(QJsonDocument::Compact));
   emit msgSent(this, msg, bytes != -1);
 }
 
 void Peer::handle()
 {
   QByteArray data = m_conn->readAll();
-  std::cout << std::format("{}", data.toStdString());
   emit newMsg(this, QString::fromStdString(data.toStdString()));
 }

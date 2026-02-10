@@ -2,7 +2,6 @@
 #include <QObject>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include "config.h"
 #include "gui/addrlabel.h"
 #include "peer.h"
 #include "self.h"
@@ -11,6 +10,10 @@
 
 int main(int argc, char *argv[])
 {
+  QCoreApplication::setOrganizationName("i3elj");
+  QCoreApplication::setOrganizationDomain("i3elj.com");
+  QCoreApplication::setApplicationName("OpenP2P");
+
   QGuiApplication app(argc, argv);
 
   QQmlApplicationEngine engine;
@@ -24,10 +27,9 @@ int main(int argc, char *argv[])
   qmlRegisterType<Peer>("App", 1, 0, "Peer");
   qmlRegisterType<AddrLabel>("App", 1, 0, "AddrLabel");
 
-  Config config(&app);
-  Self self(&config, &app);
+  Self self(&app);
   SessionManager sm(&app);
-  Server server(&sm, &app);
+  Server server(&self, &sm, &app);
   server.initTcpSocket();
 
   QQmlContext *qmlContext = engine.rootContext();

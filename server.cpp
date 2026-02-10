@@ -1,9 +1,10 @@
 #include "server.h"
 
-Server::Server(SessionManager *sm, QObject *parent)
+Server::Server(Self *user, SessionManager *sm, QObject *parent)
   : QTcpServer{parent}
-  , m_session(sm)
   , m_ipr(new IPv6AddrResolver(this))
+  , m_session(sm)
+  , m_user(user)
 {
   AddressList addresses = m_ipr->resolve();
   listen(addresses.first(), 7755);
@@ -18,7 +19,7 @@ void Server::handleNewConnection()
 {
   QTcpSocket *conn = nextPendingConnection();
   PeerId id(conn);
-  Peer *peer = new Peer(conn, id, this);
+  Peer *peer = new Peer(m_user, conn, id, this);
   emit newConnection(peer);
 }
 
@@ -35,5 +36,3 @@ void Server::rejectPeer(Peer *peer)
   peer->close();
   peer->deleteLater();
 }
-
-Server::~Server() {}
