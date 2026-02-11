@@ -30,6 +30,19 @@ ApplicationWindow {
 			Layout.fillHeight: true
 			Layout.minimumWidth: list.contentItem.childrenRect.width + (padding * 2)
 
+			Connections {
+				target: server
+
+				function onRejectedRemotely(peer) {
+					for (let i = 0; i < root.peers.count; ++i) {
+						if (root.peers.get(i).peer === peer) {
+							root.peers.remove(i)
+							break
+						}
+					}
+				}
+			}
+
 			ColumnLayout {
 				anchors.fill: parent
 				spacing: 12
@@ -76,6 +89,7 @@ ApplicationWindow {
 							}
 						}
 					}
+
 					highlight: Rectangle {
 						color: "lightsteelblue"
 						radius: 5
@@ -151,8 +165,16 @@ ApplicationWindow {
 					Layout.fillWidth: true
 				}
 
+				TextField {
+					id: peerPort
+					placeholderText: "7575"
+				}
+
 				Button {
 					text: "Connect"
+					onClicked: function () {
+						server.startConnection(peerIP.text, Number(peerPort.text))
+					}
 				}
 			}
 

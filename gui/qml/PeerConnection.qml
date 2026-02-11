@@ -14,7 +14,6 @@ Item {
 
 		function onNewConnection(p) {
 			item.peer = p
-			item.peer.name = "Fulano"
 			newConnDialog.open()
 		}
 	}

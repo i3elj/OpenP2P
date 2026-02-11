@@ -1,5 +1,6 @@
 #include "peer.h"
 #include <QJsonObject>
+#include "message.h"
 #include "self.h"
 
 Peer::Peer(Self *user, QTcpSocket *conn, PeerId id, QObject *parent)
@@ -54,13 +55,13 @@ void Peer::setName(QString n)
 
 void Peer::sendMsg(QString msg)
 {
-  QJsonObject payload{{"name", m_user->name()}, {"data", msg}};
-  qint64 bytes = m_conn->write(QJsonDocument(payload).toJson(QJsonDocument::Compact));
+  Message payload(id(), true, msg);
+  qint64 bytes = m_conn->write(payload.toBytes());
   emit msgSent(this, msg, bytes != -1);
 }
 
 void Peer::handle()
 {
-  QByteArray data = m_conn->readAll();
-  emit newMsg(this, QString::fromStdString(data.toStdString()));
+  Message payload(m_conn->readAll());
+  emit newMsg(this, payload.message());
 }

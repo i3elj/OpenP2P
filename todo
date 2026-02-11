@@ -2,20 +2,13 @@ TODO:
 1 [X] make client chat box work with nc
 1.1  [X] sending message and receiving architecture
 1.2  [X] actually send the message using tcp socket
-
 2 [-] make changing peers chat work
 2.1  [X] save chat in file
 2.2  [X] clean the chat
-
 2.3  [-] revert it
 2.3.1  [X] add name field
 2.3.2  [X] make it persistent
-
-2.3.3  [X] see if I can add metadata to the tcp request to send
-.          self name, for example.
-2.3.3.1  *   Decided to use JSON to send the data
-2.3.3.2  [ ] Figure out what to do:
-.          [ ] 1) Send the message to the SessionManager to
-.                 figure out what to do?
-.          [ ] 2) Keep it at the Server?
+2.3.3  [X] see if I can add metadata to the tcp request to send self name, for example. (JSON)
 2.3.4  [ ] finish connection through qml instead of nc
+2.3.4.1  [ ] send self data on peer setup
+2.3.4.2  [ ] add and remove peer if rejected/accepted

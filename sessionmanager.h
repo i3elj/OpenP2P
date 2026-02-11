@@ -17,10 +17,11 @@ private:
 
 public:
   explicit SessionManager(QObject *parent = nullptr);
-  void addPeer(PeerId id, Peer *peer);
+  void addPeer(Peer *peer);
 
   Q_INVOKABLE void saveChat(Peer *peer, QAbstractListModel *msgModel);
   Q_INVOKABLE QList<Message> loadChat(Peer *peer);
+  Q_INVOKABLE void addNewMsgTo(Peer *peer, bool sent, QString msg);
 
 signals:
 };

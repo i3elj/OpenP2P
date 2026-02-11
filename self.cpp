@@ -3,6 +3,9 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QStandardPaths>
+
+QString Self::userConfigDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
 Self::Self(QObject *parent)
   : QObject{parent}

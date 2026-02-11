@@ -17,6 +17,8 @@ private:
   QSettings *m_settings;
 
 public:
+  static QString userConfigDir;
+
   explicit Self(QObject *parent = nullptr);
   QString name() const;
   void setName(QString newName);

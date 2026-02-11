@@ -7,14 +7,10 @@ set(CMAKE_CXX_STANDARD 23)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt6 REQUIRED COMPONENTS Core)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
-qt_add_executable(appp2pcom
-    main.cpp
-)
+qt_add_executable(appp2pcom main.cpp)
 
 qt_add_qml_module(appp2pcom
     URI p2pcom
@@ -29,8 +25,8 @@ qt_add_qml_module(appp2pcom
     RESOURCES todo
     SOURCES sessionmanager.h sessionmanager.cpp
     SOURCES typedefs.h
-    SOURCES message.h
     SOURCES self.h self.cpp
+    SOURCES message.h message.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -44,11 +40,7 @@ set_target_properties(appp2pcom PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-target_link_libraries(appp2pcom
-    PRIVATE Qt6::Quick
-)
-target_link_libraries(appp2pcom PRIVATE Qt6::Core)
-target_link_libraries(appp2pcom PRIVATE Qt6::Core)
+target_link_libraries(appp2pcom PRIVATE Qt6::Quick)
 target_link_libraries(appp2pcom PRIVATE Qt6::Core)
 
 include(GNUInstallDirs)

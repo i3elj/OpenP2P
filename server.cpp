@@ -25,7 +25,7 @@ void Server::handleNewConnection()
 
 void Server::setupPeer(Peer *peer)
 {
-  m_session->addPeer(peer->id(), peer);
+  m_session->addPeer(peer);
   peer->setup();
 
   connect(peer, &Peer::newMsg, this, &Server::newMsg);

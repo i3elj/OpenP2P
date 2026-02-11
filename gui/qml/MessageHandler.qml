@@ -47,7 +47,7 @@ Frame {
 			if (from === peer) {
 				chatList.addMessage(false, msg)
 			} else {
-				// peerManager.addNewMsg(from, newMsg)
+				sessionManager.addNewMsgTo(from, false, newMsg)
 			}
 		}
 	}
