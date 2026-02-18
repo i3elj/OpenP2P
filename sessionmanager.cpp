@@ -1,22 +1,17 @@
 #include "sessionmanager.h"
+#include "self.h"
 #include <QBuffer>
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
-#include "self.h"
+#include <qabstractitemmodel.h>
 
-SessionManager::SessionManager(QObject *parent)
-  : QObject{parent}
-  , m_activePeers()
-{}
-
-void SessionManager::addPeer(Peer *peer)
-{
-  m_activePeers.insert(peer->id(), peer);
+SessionManager::SessionManager(Self *self, QObject *parent)
+  : QObject{parent}, m_self(self) {
+  m_peerListModel->setPeers(self->loadSavedPeers());
 }
 
-void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel)
-{
+void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel) {
   QHash<int, QByteArray> roles = msgModel->roleNames();
   int sentAttr = roles.key("sent");
   int textAttr = roles.key("text");
@@ -50,8 +45,7 @@ void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel)
   file.close();
 }
 
-QList<Message> SessionManager::loadChat(Peer *peer)
-{
+QList<Message> SessionManager::loadChat(Peer *peer) {
   QFile file(Self::userConfigDir + "/" + peer->name());
   QList<Message> messages;
 
@@ -74,7 +68,6 @@ QList<Message> SessionManager::loadChat(Peer *peer)
   return messages;
 }
 
-void SessionManager::addNewMsgTo(Peer *peer, bool sent, QString msg)
-{
+void SessionManager::addNewMsgTo(Peer *peer, bool sent, QString msg) {
   // todo
 }
