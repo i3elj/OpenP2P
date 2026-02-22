@@ -1,14 +1,3 @@
 #+title: TODO
-* DONE Make client chat box work with nc
-** DONE Sending message and receiving architecture
-** DONE Actually send the message using tcp socket
-* TODO Make changing peers chat work
-** DONE Save chat in file
-** DONE Clean the chat
-** TODO Revert it
-*** DONE Add name field
-*** DONE Make it persistent
-*** DONE See if I can add metadata to the tcp request to send self name, for example. (JSON)
-*** TODO Finish connection through qml instead of nc
-**** TODO Send self data on peer setup
-**** TODO Add and remove peer if rejected/accepted
+
+* TODO check if connecting from another app window works
