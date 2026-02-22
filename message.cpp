@@ -30,3 +30,7 @@ QJsonObject Message::json() const
 {
   return m_json;
 }
+
+Message::Type Message::type() const {
+  return m_type;
+}

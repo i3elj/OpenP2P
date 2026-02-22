@@ -5,13 +5,13 @@ import App
 
 ApplicationWindow {
 	id: root
-	minimumWidth: 920
-	minimumHeight: 460
+	minimumWidth: 1080
+	minimumHeight: 720
 	visible: true
 	title: qsTr("OpenP2P")
 
 	property Peer currentPeer: null
-	property ListModel peers: ListModel {}
+	property PeerListModel peers: PeerListModel {}
 
 	PeerConnection {
 		id: peerConn
@@ -33,14 +33,14 @@ ApplicationWindow {
 			Connections {
 				target: server
 
-				function onRejectedRemotely(peer) {
-					for (let i = 0; i < root.peers.count; ++i) {
-						if (root.peers.get(i).peer === peer) {
-							root.peers.remove(i)
-							break
-						}
-					}
-				}
+				// function onRejectedRemotely(peer) {
+				// 	for (let i = 0; i < root.peers.count; ++i) {
+				// 		if (root.peers.get(i).peer === peer) {
+				// 			root.peers.remove(i)
+				// 			break
+				// 		}
+				// 	}
+				// }
 			}
 
 			ColumnLayout {
@@ -74,7 +74,7 @@ ApplicationWindow {
 							}
 
 							Text {
-								text: model.peer.name + " " + index
+								text: model.name + " " + index
 							}
 
 							MouseArea {
@@ -84,7 +84,7 @@ ApplicationWindow {
 								onEntered: this.cursorShape = Qt.PointingHandCursor
 								onClicked: function () {
 									list.currentIndex = index
-									currentPeer = peers.get(index).peer
+									currentPeer = peers.at(index)
 								}
 							}
 						}
@@ -122,15 +122,28 @@ ApplicationWindow {
 						onIpsReceived: (ips) => ipList.ipModel = ips
 					}
 
-					Repeater {
-						model: ipList.ipModel
+					RowLayout {
+						Repeater {
+							model: ipList.ipModel
 
-						TextEdit {
-							required property string modelData
+							TextEdit {
+								required property string modelData
 
-							text: modelData
-							readOnly: true
-							selectByMouse: true
+								text: modelData
+								readOnly: true
+								selectByMouse: true
+							}
+						}
+
+						TextField {
+							id: selfPort
+							placeholderText: "Default port: 7575"
+							Component.onCompleted: text = self.port
+						}
+
+						Button {
+							text: "Save"
+							onClicked: self.port = selfPort.text
 						}
 					}
 				}
@@ -173,7 +186,7 @@ ApplicationWindow {
 				Button {
 					text: "Connect"
 					onClicked: function () {
-						server.startConnection(peerIP.text, Number(peerPort.text))
+						server.startNewConn(peerIP.text, Number(peerPort.text))
 					}
 				}
 			}

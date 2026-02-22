@@ -10,21 +10,26 @@ class Self : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+  Q_PROPERTY(int port READ port WRITE setPort NOTIFY portChanged)
 
 private:
   QString m_name;
+  int m_port;
   AddressList m_ipv6list;
   QSettings *m_settings;
 
 public:
   static QString userConfigDir;
-
+  static QString savedPeersFilePath;
   explicit Self(QObject *parent = nullptr);
   QString name() const;
   void setName(QString newName);
+  int port() const;
+  void setPort(int port);
 
 signals:
   void nameChanged();
+  void portChanged();
 };
 
 #endif // SELF_H

@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
       []() { QCoreApplication::exit(-1); }, Qt::QueuedConnection);
 
   qmlRegisterType<Peer>("App", 1, 0, "Peer");
+  qmlRegisterType<PeerListModel>("App", 1, 0, "PeerListModel");
   qmlRegisterType<AddrLabel>("App", 1, 0, "AddrLabel");
 
   Self self(&app);

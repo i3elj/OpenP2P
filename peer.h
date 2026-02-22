@@ -8,7 +8,8 @@
 
 class Self;
 
-class Peer : public QObject {
+class Peer : public QObject
+{
   Q_OBJECT
   Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
   Q_PROPERTY(QString addr READ addr CONSTANT)
@@ -24,23 +25,33 @@ private:
 
 public:
   explicit Peer(Self *user, QTcpSocket *conn, PeerId id, QObject *parent = nullptr);
-  void setup();
-  void close();
+  explicit Peer(Self *user, QObject *parent = nullptr);
+
   PeerId id() const;
+  QTcpSocket *conn() const;
+  void setConn(QTcpSocket *conn);
   QString addr() const;
   int port() const;
   QString name() const;
   void setName(QString n);
 
+  void setup();
+  void close();
+
+  bool setAddressAndPort(QString address, int port);
+  void connectToHost();
+
   Q_INVOKABLE void sendMsg(QString msg);
 
 public slots:
-  void handle();
+  void handleMessage();
 
 signals:
   void nameChanged();
   void newMsg(Peer *from, QString msg);
   void msgSent(Peer *to, QString msg, bool success);
+  void accepted(Peer *p);
+  void rejected(Peer *p);
 };
 
 #endif // PEER_H

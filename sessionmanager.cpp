@@ -1,17 +1,71 @@
 #include "sessionmanager.h"
-#include "self.h"
 #include <QBuffer>
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
-#include <qabstractitemmodel.h>
+#include "self.h"
 
-SessionManager::SessionManager(Self *self, QObject *parent)
-  : QObject{parent}, m_self(self) {
-  m_peerListModel->setPeers(self->loadSavedPeers());
+SessionManager::SessionManager(Self *user, QObject *parent)
+  : QObject{parent}
+  , m_user(user)
+{
+  loadSavedPeers();
 }
 
-void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel) {
+bool SessionManager::loadSavedPeers()
+{
+  QFile file(Self::savedPeersFilePath);
+
+  if (file.open(QIODevice::ReadOnly)) {
+    QByteArray data = file.readAll();
+    QJsonParseError error;
+    QJsonDocument doc(QJsonDocument::fromJson(data, &error));
+
+    if (doc.isNull()) {
+      qInfo() << error.errorString();
+      return false;
+    }
+
+    QJsonArray json = doc.array();
+
+    for (const QJsonValueRef &entry : json) {
+      QJsonObject peerJson = entry.toObject();
+      Peer *peer = new Peer(m_user, this);
+      peer->setName(peerJson["name"].toString());
+      peer->setAddressAndPort(peerJson["addr"].toString(), peerJson["port"].toInt());
+      m_peerMap.insert(peer->id(), peer);
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+void SessionManager::addPeer(Peer *peer)
+{
+  m_peerMap.insert(peer->id(), peer);
+}
+
+void SessionManager::deletePeer(Peer *peer)
+{
+  m_peerMap.remove(peer->id());
+}
+
+void SessionManager::activatePeer(PeerId id, QTcpSocket *conn)
+{
+  Peer *peer = m_peerMap.value(id);
+  peer->setConn(conn);
+  connect(peer->conn(), &QTcpSocket::readyRead, peer, &Peer::handleMessage);
+}
+
+PeerListModel *SessionManager::peers() const
+{
+  return m_peerModel;
+}
+
+void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel)
+{
   QHash<int, QByteArray> roles = msgModel->roleNames();
   int sentAttr = roles.key("sent");
   int textAttr = roles.key("text");
@@ -45,7 +99,8 @@ void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel) {
   file.close();
 }
 
-QList<Message> SessionManager::loadChat(Peer *peer) {
+QList<Message> SessionManager::loadChat(Peer *peer)
+{
   QFile file(Self::userConfigDir + "/" + peer->name());
   QList<Message> messages;
 
@@ -68,6 +123,7 @@ QList<Message> SessionManager::loadChat(Peer *peer) {
   return messages;
 }
 
-void SessionManager::addNewMsgTo(Peer *peer, bool sent, QString msg) {
+void SessionManager::addNewMsgTo(Peer *peer, bool sent, QString msg)
+{
   // todo
 }

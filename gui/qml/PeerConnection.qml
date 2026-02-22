@@ -7,13 +7,19 @@ Item {
 	id: item
 	property Peer peer
 	required property ApplicationWindow root
-	required property ListModel peerModel
+	required property PeerListModel peerModel
 
 	Connections {
 		target: server
 
 		function onNewConnection(p) {
 			item.peer = p
+
+			if (peerModel.contains(item.peer)) {
+				server.activatePeer(item.peer)
+				return
+			}
+
 			newConnDialog.open()
 		}
 	}
@@ -59,11 +65,7 @@ Item {
 		footer: DialogButtonBox {
 			standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
 
-			onAccepted: function () {
-				server.setupPeer(item.peer)
-				peerModel.append({"peer": item.peer})
-			}
-
+			onAccepted: server.acceptPeer(item.peer)
 			onRejected: server.rejectPeer(item.peer)
 		}
 	}

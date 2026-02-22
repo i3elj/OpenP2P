@@ -11,7 +11,7 @@ Frame {
 
 	property Peer prevPeer
 	required property Peer peer
-	required property ListModel peerModel
+	required property PeerListModel peerModel
 
 	onPeerChanged: function () {
 		if (prevPeer === null) {
