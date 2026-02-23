@@ -1,3 +1,6 @@
 #+title: TODO
 
-* TODO check if connecting from another app window works
+* DONE check if connecting from another app window works
+connecting using instances (diff appName) work
+* TODO debug peer.connectToHost()
+When trying to connect, second instance doesn't react to it.

@@ -1,24 +1,39 @@
+#include <QGuiApplication>
+#include <QObject>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include "gui/addrlabel.h"
 #include "peer.h"
 #include "self.h"
 #include "server.h"
 #include "sessionmanager.h"
-#include <QGuiApplication>
-#include <QObject>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
 
-int main(int argc, char *argv[]) {
+#define APP "OpenP2P"
+
+int main(int argc, char *argv[])
+{
+  QGuiApplication app(argc, argv);
+
   QCoreApplication::setOrganizationName("i3elj");
   QCoreApplication::setOrganizationDomain("i3elj.com");
-  QCoreApplication::setApplicationName("OpenP2P");
 
-  QGuiApplication app(argc, argv);
+  QString instance = "1";
+
+  for (int i = 0; i < argc; i++) {
+    if (QString(argv[i]).startsWith("--instance=")) {
+      instance = QString(argv[i]).mid(10);
+    }
+  }
+
+  QCoreApplication::setApplicationName(APP + QString("-") + instance);
 
   QQmlApplicationEngine engine;
   QObject::connect(
-      &engine, &QQmlApplicationEngine::objectCreationFailed, &app,
-      []() { QCoreApplication::exit(-1); }, Qt::QueuedConnection);
+    &engine,
+    &QQmlApplicationEngine::objectCreationFailed,
+    &app,
+    []() { QCoreApplication::exit(-1); },
+    Qt::QueuedConnection);
 
   qmlRegisterType<Peer>("App", 1, 0, "Peer");
   qmlRegisterType<PeerListModel>("App", 1, 0, "PeerListModel");

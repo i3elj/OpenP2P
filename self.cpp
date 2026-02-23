@@ -9,8 +9,9 @@ QString Self::savedPeersFilePath = Self::userConfigDir + "saved_peers.json";
 
 Self::Self(QObject *parent)
   : QObject{parent}
-  , m_name("")
   , m_settings(new QSettings(this))
+  , m_name(m_settings->value("name", "").toString())
+  , m_port(m_settings->value("port", 0).toInt())
 {}
 
 QString Self::name() const

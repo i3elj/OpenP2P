@@ -13,10 +13,10 @@ class Self : public QObject
   Q_PROPERTY(int port READ port WRITE setPort NOTIFY portChanged)
 
 private:
+  QSettings *m_settings;
   QString m_name;
   int m_port;
   AddressList m_ipv6list;
-  QSettings *m_settings;
 
 public:
   static QString userConfigDir;
