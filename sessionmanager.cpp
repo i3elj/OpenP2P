@@ -16,35 +16,42 @@ bool SessionManager::loadSavedPeers()
 {
   QFile file(Self::savedPeersFilePath);
 
-  if (file.open(QIODevice::ReadOnly)) {
-    QByteArray data = file.readAll();
-    QJsonParseError error;
-    QJsonDocument doc(QJsonDocument::fromJson(data, &error));
-
-    if (doc.isNull()) {
-      qInfo() << error.errorString();
-      return false;
-    }
-
-    QJsonArray json = doc.array();
-
-    for (const QJsonValueRef &entry : json) {
-      QJsonObject peerJson = entry.toObject();
-      Peer *peer = new Peer(m_user, this);
-      peer->setName(peerJson["name"].toString());
-      peer->setAddressAndPort(peerJson["addr"].toString(), peerJson["port"].toInt());
-      m_peerMap.insert(peer->id(), peer);
-    }
-
-    return true;
+  if (!file.exists()) {
+    m_user->createFiles();
   }
 
-  return false;
+  if (!file.open(QIODevice::ReadOnly)) {
+    qWarning() << "Something went wrong while reading saved files:" << file.errorString();
+    return false;
+  }
+
+  QByteArray data = file.readAll();
+  QJsonParseError error;
+  QJsonDocument doc(QJsonDocument::fromJson(data, &error));
+
+  if (doc.isNull()) {
+    qWarning() << "JSON document is empty:" << error.errorString();
+    return false;
+  }
+
+  QJsonArray json = doc.array();
+
+  for (const QJsonValueRef &entry : json) {
+    QJsonObject peerJson = entry.toObject();
+    Peer *peer = new Peer(m_user, this);
+    peer->setName(peerJson["name"].toString());
+    peer->setAddressAndPort(peerJson["addr"].toString(), peerJson["port"].toInt());
+    m_peerMap.insert(peer->id(), peer);
+    m_peerModel->addPeer(peer);
+  }
+
+  return true;
 }
 
 void SessionManager::addPeer(Peer *peer)
 {
   m_peerMap.insert(peer->id(), peer);
+  m_peerModel->addPeer(peer);
 }
 
 void SessionManager::deletePeer(Peer *peer)
@@ -78,7 +85,7 @@ void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel)
     bool sent = msgModel->data(idx, sentAttr).toBool();
     QString text = msgModel->data(idx, textAttr).toString();
     Message msg(peer->id(), sent, text);
-    chat.append(msg.json());
+    chat.append(msg.toJson());
   }
 
   // save chat to file
