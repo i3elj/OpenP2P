@@ -8,6 +8,7 @@
 SessionManager::SessionManager(Self *user, QObject *parent)
   : QObject{parent}
   , m_user(user)
+  , m_peerModel(new PeerListModel(this))
 {
   loadSavedPeers();
 }
