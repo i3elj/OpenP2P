@@ -1,36 +1,49 @@
 #include "message.h"
 
-Message::Message()
-{}
+Message::Message() {}
+
+Message::Message(Type t) : m_type(t) {}
 
 Message::Message(PeerId peerId, bool sent, QString msg)
   : m_peerId(peerId)
-  , m_data(msg)
+  , m_text(msg)
   , m_sent(sent)
-  , m_json{{"id", m_peerId.toJson()}, {"sent", m_sent}, {"data", m_data}}
+  , m_type(Type::Common)
 {}
 
 Message::Message(QByteArray data)
-  : m_json(QJsonDocument::fromJson(data).object())
 {
-  m_peerId = PeerId::fromJson(m_json["id"]);
+  QJsonObject json(QJsonDocument::fromJson(data).object());
+  m_type = Type(json["type"].toInt());
+
+  if (m_type == Type::Common) {
+    m_peerId = PeerId::fromJson(json["id"]);
+    m_text = json["text"].toString();
+    m_sent = json["sent"].toBool();
+  }
+}
+
+QJsonObject Message::toJson()
+{
+  return QJsonObject{
+    {"id", m_peerId.toJson()},
+    {"text", m_text},
+    {"sent", m_sent},
+    {"type", m_type},
+  };
 }
 
 QByteArray Message::toBytes()
 {
-  return QJsonDocument(m_json).toJson(QJsonDocument::Compact);
+  return QJsonDocument(toJson()).toJson(QJsonDocument::Compact);
 }
 
-QString Message::message()
+QString Message::text()
 {
-  return m_json["data"].toString();
+  return m_text;
 }
 
-QJsonObject Message::json() const
+Message::Type Message::type() const
 {
-  return m_json;
-}
-
-Message::Type Message::type() const {
   return m_type;
 }

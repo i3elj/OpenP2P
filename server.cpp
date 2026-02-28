@@ -22,6 +22,7 @@ void Server::startNewConn(QString address, int port)
   connect(&peer, &Peer::rejected, this, &Server::destroyPeer);
 
   peer.connectToHost();
+  peer.sendMsg(Message());
 }
 
 void Server::initTcpSocket()

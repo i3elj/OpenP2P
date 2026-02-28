@@ -95,19 +95,24 @@ void Peer::connectToHost()
   });
 
   // connect(m_conn, &QTcpSocket::errorOccurred, this, [](){});
-
   m_conn->connectToHost(m_addr, m_port);
 }
 
-void Peer::sendMsg(QString msg)
+void Peer::sendMsg(QString txt) // reimplement
 {
-  Message payload(id(), true, msg);
+  Message payload(id(), true, txt);
   qint64 bytes = m_conn->write(payload.toBytes());
-  emit msgSent(this, msg, bytes != -1);
+  emit msgSent(this, txt, bytes != -1);
+}
+
+void Peer::sendMsg(Message msg) // reimplement
+{
+  qint64 bytes = m_conn->write(msg.toBytes());
+  emit msgSent(this, msg.toBytes(), bytes != -1);
 }
 
 void Peer::handleMessage()
 {
   Message payload(m_conn->readAll());
-  emit newMsg(this, payload.message());
+  emit newMsg(this, payload.text());
 }

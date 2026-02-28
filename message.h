@@ -10,18 +10,18 @@ public:
   enum Type { Reject = 0, Accept = 1, Common = 2};
 
   explicit Message();
+  explicit Message(Type t);
   explicit Message(PeerId peerId, bool sent, QString msg);
   explicit Message(QByteArray data);
+  QJsonObject toJson();
   QByteArray toBytes();
-  QString message();
-  QJsonObject json() const;
+  QString text();
   Message::Type type() const;
 
 private:
   PeerId m_peerId;
-  QString m_data;
+  QString m_text;
   bool m_sent;
-  QJsonObject m_json;
   Message::Type m_type;
 };
 

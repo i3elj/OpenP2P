@@ -4,6 +4,7 @@
 #include <QHostAddress>
 #include <QObject>
 #include <QTcpSocket>
+#include "message.h"
 #include "peerid.h"
 
 class Self;
@@ -41,7 +42,8 @@ public:
   bool setAddressAndPort(QString address, int port);
   void connectToHost();
 
-  Q_INVOKABLE void sendMsg(QString msg);
+  Q_INVOKABLE void sendMsg(QString txt);
+  void sendMsg(Message msg);
 
 public slots:
   void handleMessage();
