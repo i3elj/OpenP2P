@@ -11,7 +11,7 @@ ApplicationWindow {
 	title: qsTr("OpenP2P")
 
 	property Peer currentPeer: null
-	property PeerListModel peers: PeerListModel {}
+	property PeerListModel peers: sessionManager.peers
 
 	PeerConnection {
 		id: peerConn
