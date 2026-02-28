@@ -26,6 +26,7 @@ public:
   void setName(QString newName);
   int port() const;
   void setPort(int port);
+  void createFiles() const;
 
 signals:
   void nameChanged();

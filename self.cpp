@@ -1,10 +1,11 @@
 #include "self.h"
+#include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QStandardPaths>
 #include "peer.h"
 
-QString Self::userConfigDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+QString Self::userConfigDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/OpenP2P/";
 QString Self::savedPeersFilePath = Self::userConfigDir + "saved_peers.json";
 
 Self::Self(QObject *parent)
@@ -39,5 +40,19 @@ void Self::setPort(int port)
     m_port = port;
     m_settings->setValue("port", m_port);
     emit portChanged();
+  }
+}
+
+void Self::createFiles() const
+{
+  QDir dir;
+  QFile file(savedPeersFilePath);
+
+  if (!dir.exists(userConfigDir)) {
+    dir.mkdir(userConfigDir);
+  }
+
+  if (file.open(QIODevice::Append)) {
+    file.close();
   }
 }
