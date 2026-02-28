@@ -10,6 +10,7 @@
 
 class SessionManager : public QObject {
   Q_OBJECT
+  Q_PROPERTY(PeerListModel* peers READ peers CONSTANT)
 
 private:
   const QString m_chatsFilePath = "/OpenP2P/chats";
