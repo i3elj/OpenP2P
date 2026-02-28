@@ -3,7 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QObject>
-#include "typedefs.h"
+#include "peer.h"
 
 class PeerListModel : public QAbstractListModel
 {
@@ -13,19 +13,17 @@ private:
   QList<Peer *> m_peers;
 
 public:
-  enum Roles { NameRole = Qt::UserRole + 1, AddrRole, PortRole };
+  enum Roles { PeerRole };
+
   explicit PeerListModel(QObject *parent = nullptr);
-  void setPeers(const PeerHashMap &peers);
   int rowCount(const QModelIndex &parent = QModelIndex()) const override;
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
   QHash<int, QByteArray> roleNames() const override;
   void addPeer(Peer *peer);
   void removePeer(Peer *peer);
 
-  Q_INVOKABLE Peer* at(int index);
-
-public slots:
-  void peerDataChanged(Peer *peer);
+  Q_INVOKABLE Peer* at(int index) const;
+  Q_INVOKABLE bool contains(Peer *peer) const;
 
 signals:
 };
