@@ -27,27 +27,28 @@ int main(int argc, char *argv[])
 
   QCoreApplication::setApplicationName(APP + QString("-") + instance);
 
+  Self self(&app);
+  SessionManager sm(&self, &app);
+  Server server(&self, &sm, &app);
+  server.initTcpSocket();
+
   QQmlApplicationEngine engine;
+
+  QQmlContext *qmlContext = engine.rootContext();
+  qmlContext->setContextProperty("self", &self);
+  qmlContext->setContextProperty("sessionManager", &sm);
+  qmlContext->setContextProperty("server", &server);
+
+  qmlRegisterType<Peer>("App", 1, 0, "Peer");
+  qmlRegisterType<PeerListModel>("App", 1, 0, "PeerListModel");
+  qmlRegisterType<AddrLabel>("App", 1, 0, "AddrLabel");
+
   QObject::connect(
     &engine,
     &QQmlApplicationEngine::objectCreationFailed,
     &app,
     []() { QCoreApplication::exit(-1); },
     Qt::QueuedConnection);
-
-  qmlRegisterType<Peer>("App", 1, 0, "Peer");
-  qmlRegisterType<PeerListModel>("App", 1, 0, "PeerListModel");
-  qmlRegisterType<AddrLabel>("App", 1, 0, "AddrLabel");
-
-  Self self(&app);
-  SessionManager sm(&self, &app);
-  Server server(&self, &sm, &app);
-  server.initTcpSocket();
-
-  QQmlContext *qmlContext = engine.rootContext();
-  qmlContext->setContextProperty("self", &self);
-  qmlContext->setContextProperty("sessionManager", &sm);
-  qmlContext->setContextProperty("server", &server);
 
   engine.loadFromModule("p2pcom", "Main");
 
