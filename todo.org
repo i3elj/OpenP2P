@@ -1,33 +1,5 @@
 #+title: TODO
 
-* TODO make peerlistmodel work on both ends
-right now this only works on the receiving end. I have to make it work on the sender too.
-* DONE debug peer.connectToHost()
-When trying to connect, second instance doesn't react to it.
+* TODO Add cryptography                                                :#2:
 
-it was missing a second call after the connect();
-
-#+BEGIN_SRC c++
-peer.connectToHost();
-peer.sendMsg(); // <-- here
-#+END_SRC
-
-** DONE update Message class for better structure
-#+begin_src json
-  {
-    "type": "common",
-    "sent": 1,
-    "time": "2026-02-26 19:14:35",
-    "text": "hi man, how are you doing?",
-    "dest": {
-      "addr": "XXX:XXX:XXX:XXX::XXXX",
-      "port": 7755
-    }
-  }
-
-  {
-    "type": "reject",
-  }
-#+end_src
-* DONE check if connecting from another app window works
-connecting using instances (diff appName) work
+* TODO Automatic reconnections                                         :#1:
