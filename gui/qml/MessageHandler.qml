@@ -34,21 +34,16 @@ Frame {
 	Connections {
 		target: peer
 
-		function onMsgSent(to, msg, success) {
-			if (to === peer) {
-				chatList.addMessage(true, msg)
+		function onMsgSent(msg, success) {
+			if (!success) {
+				console.warn("Message not sent");
+				return;
 			}
+			chatList.addMessage(true, msg)
 		}
-	}
 
-	Connections {
-		target: server
-		function onNewMsg(from, msg) {
-			if (from === peer) {
-				chatList.addMessage(false, msg)
-			} else {
-				sessionManager.addNewMsgTo(from, false, newMsg)
-			}
+		function onNewMsg(msg) {
+			chatList.addMessage(false, msg)
 		}
 	}
 

@@ -70,11 +70,11 @@ ApplicationWindow {
 								width: 40
 								height: 40
 								radius: 5
-								color: "blue"
+								color: model.peer.active ? "blue" : "red"
 							}
 
 							Text {
-								text: model.name + " " + index
+								text: model.peer.name
 							}
 
 							MouseArea {

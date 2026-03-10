@@ -1,36 +1,33 @@
 #include "peer.h"
 #include <QJsonObject>
 #include "message.h"
-#include "self.h"
 
-Peer::Peer(Self *user, QTcpSocket *conn, PeerId id, QObject *parent)
+Peer::Peer(QTcpSocket *conn, QObject *parent)
   : QObject{parent}
-  , m_id(id)
+  , m_id()
+  , m_name("")
+  , m_addr()
+  , m_port(0)
   , m_conn(conn)
-  , m_user(user)
+  , m_active(false)
 {
   m_conn->setParent(this);
   m_addr = m_conn->peerAddress();
-  m_port = m_conn->peerPort();
+  connect(m_conn, &QTcpSocket::connected, this, &Peer::activate);
+  connect(m_conn, &QTcpSocket::disconnected, this, &Peer::deactivate);
 }
 
-Peer::Peer(Self *user, QObject *parent)
+Peer::Peer(QObject *parent)
   : QObject{parent}
-  , m_conn(new QTcpSocket())
-  , m_user(user)
+  , m_id()
+  , m_name("")
+  , m_addr()
+  , m_port(0)
+  , m_conn(new QTcpSocket(this))
+  , m_active(false)
 {
-  m_conn->setParent(this);
-}
-
-void Peer::setup()
-{
-  connect(m_conn, &QTcpSocket::readyRead, this, &Peer::handleMessage);
-}
-
-void Peer::close()
-{
-  m_conn->write("Rejected");
-  m_conn->abort();
+  connect(m_conn, &QTcpSocket::connected, this, &Peer::activate);
+  connect(m_conn, &QTcpSocket::disconnected, this, &Peer::deactivate);
 }
 
 PeerId Peer::id() const
@@ -38,10 +35,9 @@ PeerId Peer::id() const
   return m_id;
 }
 
-QTcpSocket *Peer::conn() const { return m_conn; }
-
-void Peer::setConn(QTcpSocket *conn) {
-  m_conn = conn;
+QString Peer::name() const
+{
+  return m_name;
 }
 
 QString Peer::addr() const
@@ -54,9 +50,13 @@ int Peer::port() const
   return m_port;
 }
 
-QString Peer::name() const
+bool Peer::isActive() const {
+  return m_active;
+}
+
+QTcpSocket *Peer::conn() const
 {
-  return m_name;
+  return m_conn;
 }
 
 void Peer::setName(QString n)
@@ -65,6 +65,48 @@ void Peer::setName(QString n)
     return;
   m_name = n;
   emit nameChanged();
+}
+
+bool Peer::setAddr(QString address)
+{
+  QHostAddress addr;
+
+  if (!addr.setAddress(address) || addr.protocol() != QAbstractSocket::IPv6Protocol) {
+    return false;
+  }
+
+  m_addr = addr;
+  return true;
+}
+
+void Peer::setPort(int port)
+{
+  m_port = port;
+  m_id = PeerId(m_addr, m_port);
+}
+
+void Peer::setConn(QTcpSocket *conn)
+{
+  m_conn = conn;
+  m_conn->setParent(this);
+  connect(m_conn, &QTcpSocket::connected, this, &Peer::activate);
+  connect(m_conn, &QTcpSocket::disconnected, this, &Peer::deactivate);
+
+  if (m_conn->state() == QTcpSocket::ConnectedState) {
+    activate();
+  }
+}
+
+
+void Peer::setup()
+{
+  connect(m_conn, &QTcpSocket::readyRead, this, &Peer::handle);
+}
+
+void Peer::close()
+{
+  m_conn->write("Rejected");
+  m_conn->abort();
 }
 
 bool Peer::setAddressAndPort(QString address, int port)
@@ -77,42 +119,54 @@ bool Peer::setAddressAndPort(QString address, int port)
 
   m_addr = addr;
   m_port = port;
+  m_id = PeerId(m_addr, m_port);
   return true;
 }
 
 void Peer::connectToHost()
 {
-  connect(m_conn, &QTcpSocket::readyRead, m_conn, [this]() {
-    Message msg(m_conn->readAll());
-
-    if (msg.type() == Message::Type::Reject) {
-      disconnect(m_conn);
-      emit rejected(this);
-      return;
-    }
-
-    emit accepted(this);
-  });
-
-  // connect(m_conn, &QTcpSocket::errorOccurred, this, [](){});
   m_conn->connectToHost(m_addr, m_port);
 }
 
 void Peer::sendMsg(QString txt) // reimplement
 {
-  Message payload(id(), true, txt);
-  qint64 bytes = m_conn->write(payload.toBytes());
-  emit msgSent(this, txt, bytes != -1);
+  Message msg(true, txt);
+  sendMsg(msg);
 }
 
 void Peer::sendMsg(Message msg) // reimplement
 {
   qint64 bytes = m_conn->write(msg.toBytes());
-  emit msgSent(this, msg.toBytes(), bytes != -1);
+  qWarning() << "Bytes written:" << bytes << ". Success? " << (bytes != -1);
+  emit msgSent(msg.text(), bytes != -1);
 }
 
-void Peer::handleMessage()
+/**
+ * Slot functions.
+ */
+
+void Peer::handle()
 {
-  Message payload(m_conn->readAll());
-  emit newMsg(this, payload.text());
+  Message req(m_conn->readAll());
+
+  if (req.type() == Message::Type::DataExchange) {
+    setName(req.hostName());
+    return;
+  }
+
+  qWarning() << "Message received from" << m_name << ", said:" << req.text();
+  emit newMsg(req.text());
+}
+
+void Peer::activate()
+{
+  m_active = true;
+  emit activeChanged();
+}
+
+void Peer::deactivate()
+{
+  m_active = false;
+  m_conn->deleteLater();
+  emit activeChanged();
 }

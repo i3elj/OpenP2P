@@ -65,8 +65,8 @@ Item {
 		footer: DialogButtonBox {
 			standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
 
-			onAccepted: server.acceptPeer(item.peer)
-			onRejected: server.rejectPeer(item.peer)
+			onAccepted: server.acceptIncomingPeer(item.peer)
+			onRejected: server.rejectIncomingPeer(item.peer)
 		}
 	}
 }
