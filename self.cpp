@@ -12,12 +12,12 @@ Self::Self(QObject *parent)
   : QObject{parent}
   , m_settings(new QSettings(this))
   , m_name(m_settings->value("name", "").toString())
-  , m_port(m_settings->value("port", 0).toInt())
+  , m_port(m_settings->value("port", 7755).toInt())
 {}
 
 QString Self::name() const
 {
-  return m_name == "" ? m_settings->value("name", "").toString() : m_name;
+  return m_settings->value("name", m_name).toString();
 }
 
 void Self::setName(QString newName)
@@ -31,7 +31,7 @@ void Self::setName(QString newName)
 
 int Self::port() const
 {
-  return m_port == 0 ? m_settings->value("port", 0).toInt() : m_port;
+  return m_settings->value("port", m_port).toInt();
 }
 
 void Self::setPort(int port)

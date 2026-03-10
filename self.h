@@ -19,6 +19,15 @@ private:
   AddressList m_ipv6list;
 
 public:
+  struct SettingsKeys {
+    static constexpr const char* Type = "type";
+    static constexpr const char* Text = "text";
+    static constexpr const char* Sent = "sent";
+    static constexpr const char* Name = "name";
+    static constexpr const char* Addr = "addr";
+    static constexpr const char* Port = "port";
+  };
+
   static QString userConfigDir;
   static QString savedPeersFilePath;
   explicit Self(QObject *parent = nullptr);
