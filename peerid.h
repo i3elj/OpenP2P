@@ -14,12 +14,6 @@ struct PeerId
 
   explicit PeerId() {}
 
-  explicit PeerId(QTcpSocket *conn)
-  {
-    addr = conn->peerAddress();
-    port = conn->peerPort();
-  }
-
   explicit PeerId(QHostAddress addr, int port)
     : addr(addr)
     , port(port)
