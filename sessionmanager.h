@@ -19,13 +19,18 @@ private:
   Self *m_user;
 
   bool loadSavedPeers();
+  bool savePeersToFile(QJsonArray peers);
+  QJsonArray loadPeersFromFile();
 
 public:
   explicit SessionManager(Self *user, QObject *parent = nullptr);
+  ~SessionManager();
+  bool contains(PeerId peerid);
   void addPeer(Peer *peer);
   void deletePeer(Peer *peer);
-  void activatePeer(PeerId id, QTcpSocket *conn);
   Peer* getPeer(PeerId id);
+  bool saveAllPeers();
+  bool savePeer(Peer *peer);
 
   Q_INVOKABLE PeerListModel* peers() const;
   Q_INVOKABLE void saveChat(Peer *peer, QAbstractListModel *msgModel);

@@ -3,17 +3,54 @@
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
+#include <QJsonObject>
 #include "self.h"
 
-SessionManager::SessionManager(Self *user, QObject *parent)
-  : QObject{parent}
-  , m_user(user)
-  , m_peerModel(new PeerListModel(this))
-{
-  loadSavedPeers();
-}
+/**
+ * Private functions.
+ */
 
 bool SessionManager::loadSavedPeers()
+{
+  QJsonArray peersArray = loadPeersFromFile();
+
+  for (const QJsonValueRef &entry : peersArray) {
+    QJsonObject json = entry.toObject();
+    Peer *peer = new Peer(this);
+    peer->setName(json[Self::SettingsKeys::Name].toString());
+    peer->setAddr(json[Self::SettingsKeys::Addr].toString());
+    peer->setPort(json[Self::SettingsKeys::Port].toInt());
+    m_peerMap.insert(peer->id(), peer);
+    m_peerModel->addPeer(peer);
+  }
+
+  return true;
+}
+
+bool SessionManager::savePeersToFile(QJsonArray peers)
+{
+  QFile file(Self::savedPeersFilePath);
+
+  if (!file.exists())
+    m_user->createFiles();
+
+  if (!file.open(QFile::WriteOnly)) {
+    qWarning() << "Can't open file to save peers:" << file.errorString();
+    return false;
+  }
+
+  auto bytesWritten = file.write(QJsonDocument(peers).toJson(QJsonDocument::Indented));
+
+  if (bytesWritten == -1) {
+    qWarning() << "Couldn't save peers:" << file.errorString();
+    return false;
+  }
+
+  file.close();
+  return true;
+}
+
+QJsonArray SessionManager::loadPeersFromFile()
 {
   QFile file(Self::savedPeersFilePath);
 
@@ -23,7 +60,7 @@ bool SessionManager::loadSavedPeers()
 
   if (!file.open(QIODevice::ReadOnly)) {
     qWarning() << "Something went wrong while reading saved files:" << file.errorString();
-    return false;
+    return QJsonArray();
   }
 
   QByteArray data = file.readAll();
@@ -32,40 +69,93 @@ bool SessionManager::loadSavedPeers()
 
   if (doc.isNull()) {
     qWarning() << "JSON document is empty:" << error.errorString();
-    return false;
+    return QJsonArray();
   }
 
-  QJsonArray json = doc.array();
+  return doc.array();
+}
 
-  for (const QJsonValueRef &entry : json) {
-    QJsonObject peerJson = entry.toObject();
-    Peer *peer = new Peer(m_user, this);
-    peer->setName(peerJson["name"].toString());
-    peer->setAddressAndPort(peerJson["addr"].toString(), peerJson["port"].toInt());
-    m_peerMap.insert(peer->id(), peer);
-    m_peerModel->addPeer(peer);
-  }
+/**
+ * Public functions.
+ */
 
-  return true;
+SessionManager::SessionManager(Self *user, QObject *parent)
+  : QObject{parent}
+  , m_user(user)
+  , m_peerModel(new PeerListModel(this))
+{
+  loadSavedPeers();
+}
+
+SessionManager::~SessionManager()
+{
+  saveAllPeers();
+}
+
+bool SessionManager::contains(PeerId peerid)
+{
+  return m_peerMap.contains(peerid);
 }
 
 void SessionManager::addPeer(Peer *peer)
 {
+  peer->setParent(this);
   m_peerMap.insert(peer->id(), peer);
   m_peerModel->addPeer(peer);
+
+  if (!savePeer(peer)) {
+    qWarning() << "Couldn't save peer";
+  }
 }
 
 void SessionManager::deletePeer(Peer *peer)
 {
   m_peerMap.remove(peer->id());
+
+  if (!saveAllPeers()) {
+    qWarning() << "Couldn't save peers";
+  }
 }
 
-void SessionManager::activatePeer(PeerId id, QTcpSocket *conn)
+Peer *SessionManager::getPeer(PeerId id)
 {
-  Peer *peer = m_peerMap.value(id);
-  peer->setConn(conn);
-  connect(peer->conn(), &QTcpSocket::readyRead, peer, &Peer::handleMessage);
+  return m_peerMap.value(id, nullptr);
 }
+
+bool SessionManager::saveAllPeers()
+{
+  QJsonArray arr;
+
+  for (const auto &peer : m_peerMap) {
+    if (!peer)
+      continue;
+    QJsonObject json{{Self::SettingsKeys::Name, peer->name()},
+                     {Self::SettingsKeys::Addr, peer->addr()},
+                     {Self::SettingsKeys::Port, peer->port()}};
+    arr.append(json);
+  }
+
+  return savePeersToFile(arr);
+}
+
+bool SessionManager::savePeer(Peer *peer)
+{
+  QJsonArray peers = loadPeersFromFile();
+  QJsonObject jsonPeer{{Self::SettingsKeys::Name, peer->name()},
+                       {Self::SettingsKeys::Addr, peer->addr()},
+                       {Self::SettingsKeys::Port, peer->port()}};
+
+  if (!peers.contains(jsonPeer)) {
+    peers.append(jsonPeer);
+    return savePeersToFile(peers);
+  }
+
+  return false;
+}
+
+/**
+ * Q_INVOKABLE Functions.
+ */
 
 PeerListModel *SessionManager::peers() const
 {
@@ -85,7 +175,7 @@ void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel)
     QModelIndex idx = msgModel->index(i, 0);
     bool sent = msgModel->data(idx, sentAttr).toBool();
     QString text = msgModel->data(idx, textAttr).toString();
-    Message msg(peer->id(), sent, text);
+    Message msg(sent, text);
     chat.append(msg.toJson());
   }
 
@@ -124,7 +214,7 @@ QList<Message> SessionManager::loadChat(Peer *peer)
   QJsonArray chat = doc.array();
 
   for (const QJsonValue &json : chat) {
-    Message msg(peer->id(), json["sent"].toBool(), json["data"].toString());
+    Message msg(json[Self::SettingsKeys::Sent].toBool(), json[Self::SettingsKeys::Text].toString());
     messages.append(msg);
   }
 
