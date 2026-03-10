@@ -20,7 +20,7 @@ public:
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
   QHash<int, QByteArray> roleNames() const override;
   void addPeer(Peer *peer);
-  void removePeer(Peer *peer);
+  bool removePeer(Peer *peer);
 
   Q_INVOKABLE Peer* at(int index) const;
   Q_INVOKABLE bool contains(Peer *peer) const;

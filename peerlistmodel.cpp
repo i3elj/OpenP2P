@@ -13,12 +13,17 @@ void PeerListModel::addPeer(Peer *peer)
   endInsertRows();
 }
 
-void PeerListModel::removePeer(Peer *peer)
+bool PeerListModel::removePeer(Peer *peer)
 {
-  beginRemoveRows(QModelIndex(), m_peers.size(), m_peers.size());
   int index = m_peers.indexOf(peer);
+
+  if (index < 0)
+    return false;
+
+  beginRemoveRows(QModelIndex(), index, index);
   m_peers.removeAt(index);
   endRemoveRows();
+  return true;
 }
 
 int PeerListModel::rowCount(const QModelIndex &parent) const
