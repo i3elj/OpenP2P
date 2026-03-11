@@ -25,10 +25,11 @@ private:
 public:
   explicit SessionManager(Self *user, QObject *parent = nullptr);
   ~SessionManager();
-  bool contains(PeerId peerid);
+  bool contains(PeerId peerid) const;
   void addPeer(Peer *peer);
   void deletePeer(Peer *peer);
-  Peer* getPeer(PeerId id);
+  Peer* getPeer(PeerId id) const;
+  QHash<PeerId, Peer*> getAllPeers() const;
   bool saveAllPeers();
   bool savePeer(Peer *peer);
 

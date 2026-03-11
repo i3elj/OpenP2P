@@ -92,7 +92,7 @@ SessionManager::~SessionManager()
   saveAllPeers();
 }
 
-bool SessionManager::contains(PeerId peerid)
+bool SessionManager::contains(PeerId peerid) const
 {
   return m_peerMap.contains(peerid);
 }
@@ -117,7 +117,12 @@ void SessionManager::deletePeer(Peer *peer)
   }
 }
 
-Peer *SessionManager::getPeer(PeerId id)
+QHash<PeerId, Peer *> SessionManager::getAllPeers() const
+{
+  return m_peerMap;
+}
+
+Peer *SessionManager::getPeer(PeerId id) const
 {
   return m_peerMap.value(id, nullptr);
 }
@@ -225,3 +230,4 @@ void SessionManager::addNewMsgTo(Peer *peer, bool sent, QString msg)
 {
   // todo
 }
+
