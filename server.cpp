@@ -28,6 +28,7 @@ void Server::finalizePeerConnection(Peer *peer)
     m_session->addPeer(peer);
   }
 
+  peer->setupConnection();
   peer->setup();
   emit peerConnectionFinalized(peer);
 }
@@ -48,6 +49,17 @@ void Server::exchangeData(Peer *peer)
     if (req.type() == Message::Type::Accept)
       onRemoteAccepted(peer, req);
   });
+}
+
+void Server::tryReconnecting(Peer *peer)
+{
+  if (peer->isActive()) {
+    emit peerAlreadyConnected(peer->id());
+  } else {
+    peer->setConn();
+    peer->connectToHost();
+    exchangeData(peer);
+  }
 }
 
 /**
@@ -73,22 +85,37 @@ void Server::initTcpSocket()
  * Q_INVOKABLE Functions
  */
 
+void Server::tryReconnectAll()
+{
+  for (const auto& peer : m_session->getAllPeers()) {
+    tryReconnecting(peer);
+  }
+}
+
+void Server::acceptIncomingPeer(Peer *peer)
+{
+  finalizePeerConnection(peer);
+  Message res(Message::Type::Accept);
+  res.setMetaData(m_user->name(), m_user->port());
+  peer->sendMsg(res);
+  peer->activate();
+}
+
+void Server::rejectIncomingPeer(Peer *peer)
+{
+  disconnect(peer->conn(), &QTcpSocket::connected, nullptr, nullptr);
+  disconnect(peer->conn(), &QTcpSocket::readyRead, nullptr, nullptr);
+
+  peer->close();
+  peer->deleteLater();
+}
+
 void Server::startNewConn(QString address, int port)
 {
   PeerId id(QHostAddress(address), port);
 
   if (m_session->contains(id)) {
-    Peer *sessPeer = m_session->getPeer(id);
-
-    if (sessPeer->isActive()) {
-      emit peerAlreadyConnected(sessPeer->id());
-      return;
-    }
-
-    sessPeer->setConn();
-    sessPeer->connectToHost();
-    exchangeData(sessPeer);
-    emit peerAlreadyConnected(sessPeer->id());
+    tryReconnecting(m_session->getPeer(id));
     return;
   }
 
@@ -104,28 +131,10 @@ void Server::startNewConn(QString address, int port)
   peer->connectToHost();
 }
 
-void Server::acceptIncomingPeer(Peer *peer)
-{
-  finalizePeerConnection(peer);
-  Message res(Message::Type::Accept);
-  res.setMetaData(m_user->name(), m_user->port());
-  peer->sendMsg(res);
-}
-
-void Server::rejectIncomingPeer(Peer *peer)
-{
-  disconnect(peer->conn(), &QTcpSocket::connected, nullptr, nullptr);
-  disconnect(peer->conn(), &QTcpSocket::readyRead, nullptr, nullptr);
-
-  peer->close();
-  peer->deleteLater();
-}
-
 /**
  * Slots Functions
  */
 
-// TODO: debug
 void Server::handleNewConnection()
 {
   QTcpSocket *conn = nextPendingConnection();
@@ -149,7 +158,7 @@ void Server::handleNewConnection()
         }
 
         disconnect(peer->conn(), &QTcpSocket::readyRead, nullptr, nullptr);
-        sessPeer->setConn(peer->conn()); // monitor this.m_session.m_peerMap and m_peerModel
+        sessPeer->setConn(peer->conn());
         Message res(Message::Type::Accept);
         res.setMetaData(m_user->name(), m_user->port());
         sessPeer->sendMsg(res);

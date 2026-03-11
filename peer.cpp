@@ -13,8 +13,8 @@ Peer::Peer(QTcpSocket *conn, QObject *parent)
 {
   m_conn->setParent(this);
   m_addr = m_conn->peerAddress();
-  connect(m_conn, &QTcpSocket::connected, this, &Peer::activate);
-  connect(m_conn, &QTcpSocket::disconnected, this, &Peer::deactivate);
+  connect(this, &Peer::connectionChanged, this, &Peer::setupConnection);
+  emit connectionChanged();
 }
 
 Peer::Peer(QObject *parent)
@@ -26,8 +26,17 @@ Peer::Peer(QObject *parent)
   , m_conn(new QTcpSocket(this))
   , m_active(false)
 {
-  connect(m_conn, &QTcpSocket::connected, this, &Peer::activate);
-  connect(m_conn, &QTcpSocket::disconnected, this, &Peer::deactivate);
+  connect(this, &Peer::connectionChanged, this, &Peer::setupConnection);
+  emit connectionChanged();
+}
+
+Peer::~Peer()
+{
+  if (m_conn == nullptr)
+    return;
+
+  if (m_conn->state() == QTcpSocket::ConnectedState)
+    m_conn->disconnectFromHost();
 }
 
 PeerId Peer::id() const
@@ -50,7 +59,8 @@ int Peer::port() const
   return m_port;
 }
 
-bool Peer::isActive() const {
+bool Peer::isActive() const
+{
   return m_active;
 }
 
@@ -89,14 +99,12 @@ void Peer::setConn(QTcpSocket *conn)
 {
   m_conn = conn;
   m_conn->setParent(this);
-  connect(m_conn, &QTcpSocket::connected, this, &Peer::activate);
-  connect(m_conn, &QTcpSocket::disconnected, this, &Peer::deactivate);
+  emit connectionChanged();
 
   if (m_conn->state() == QTcpSocket::ConnectedState) {
     activate();
   }
 }
-
 
 void Peer::setup()
 {
@@ -169,4 +177,11 @@ void Peer::deactivate()
   m_active = false;
   m_conn->deleteLater();
   emit activeChanged();
+}
+
+void Peer::setupConnection()
+{
+  connect(m_conn, &QTcpSocket::connected, this, &Peer::activate);
+  connect(m_conn, &QTcpSocket::disconnected, this, &Peer::deactivate);
+  connect(m_conn, &QTcpSocket::errorOccurred, this, &Peer::deactivate);
 }

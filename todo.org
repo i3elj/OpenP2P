@@ -1,5 +1,21 @@
 #+title: TODO
 
-* TODO Add cryptography                                                :#2:
+* TODO <<DEBUG>>
+1. A starts
+2. B starts
+3. B connects to A
+   1. A accepts
+4. B closes
+5. B reopens
+   1. B tries to connect to every saved peer (A)
+   2. Something happens ???
+   3. B tries to send message to A
+   4. B crashes (segmentation fault) at
+      #+begin_src c++
+        void Peer::sendMsg(Message msg) {
+          qint64 bytes = m_conn->write(msg.toBytes()); <<<< segfaults
+        }
+      #+end_src
 
+* TODO Add cryptography                                                :#2:
 * TODO Automatic reconnections                                         :#1:

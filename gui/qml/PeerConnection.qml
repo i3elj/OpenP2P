@@ -4,69 +4,69 @@ import QtQuick.Layouts
 import App
 
 Item {
-	id: item
-	property Peer peer
-	required property ApplicationWindow root
-	required property PeerListModel peerModel
+    id: item
+    property Peer peer
+    required property ApplicationWindow root
+    required property PeerListModel peerModel
 
-	Connections {
-		target: server
+    Connections {
+        target: server
 
-		function onNewConnection(p) {
-			item.peer = p
+        function onNewConnection(p) {
+            item.peer = p
 
-			if (peerModel.contains(item.peer)) {
-				server.activatePeer(item.peer)
-				return
-			}
+            if (peerModel.contains(item.peer)) {
+                server.activatePeer(item.peer)
+                return
+            }
 
-			newConnDialog.open()
-		}
-	}
+            newConnDialog.open()
+        }
+    }
 
-	Dialog {
-		id: newConnDialog
-		title: "New Connection Request!"
-		width: 580
-		x: root.width - width - 32
-		y: root.height - height - 76
+    Dialog {
+        id: newConnDialog
+        title: "New Connection Request!"
+        width: 580
+        x: root.width - width - 32
+        y: root.height - height - 76
 
-		contentItem: ColumnLayout {
-			spacing: 12
+        contentItem: ColumnLayout {
+            spacing: 12
 
-			Label {
-				text: item.peer ? item.peer.name + " wants to connect with you." : ""
-				wrapMode: Label.Wrap
-				Layout.fillWidth: true
-			}
+            Label {
+                text: item.peer ? item.peer.name + " wants to connect with you." : ""
+                wrapMode: Label.Wrap
+                Layout.fillWidth: true
+            }
 
-			GridLayout {
-				columns: 2
-				columnSpacing: 20
-				rowSpacing: 12
+            GridLayout {
+                columns: 2
+                columnSpacing: 20
+                rowSpacing: 12
 
-				Label {
-					text: "Address:"
-				}
-				Label {
-					text: item.peer ? item.peer.addr : ""
-					Layout.fillWidth: true
-					wrapMode: Label.Wrap
-				}
-				Label {
-					text: "Port Number:"
-				}
-				Label {
-					text: item.peer ? item.peer.port : ""
-				}
-			}
-		}
+                Label {
+                    text: "Address:"
+                }
+                Label {
+                    text: item.peer ? item.peer.addr : ""
+                    Layout.fillWidth: true
+                    wrapMode: Label.Wrap
+                }
+                Label {
+                    text: "Port Number:"
+                }
+                Label {
+                    text: item.peer ? item.peer.port : ""
+                }
+            }
+        }
 
-		footer: DialogButtonBox {
-			standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
+        footer: DialogButtonBox {
+            standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
 
-			onAccepted: server.acceptIncomingPeer(item.peer)
-			onRejected: server.rejectIncomingPeer(item.peer)
-		}
-	}
+            onAccepted: server.acceptIncomingPeer(item.peer)
+            onRejected: server.rejectIncomingPeer(item.peer)
+        }
+    }
 }

@@ -28,6 +28,7 @@ private:
 public:
   explicit Peer(QTcpSocket *conn, QObject *parent = nullptr);
   explicit Peer(QObject *parent = nullptr);
+  ~Peer();
 
   PeerId id() const;
   QString name() const;
@@ -54,10 +55,12 @@ public slots:
   void handle();
   void activate();
   void deactivate();
+  void setupConnection();
 
 signals:
   void nameChanged();
   void activeChanged();
+  void connectionChanged();
   void newMsg(QString msg);
   void msgSent(QString msg, bool success);
   void accepted(Peer *p);
