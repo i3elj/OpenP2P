@@ -30,15 +30,6 @@ Peer::Peer(QObject *parent)
   emit connectionChanged();
 }
 
-Peer::~Peer()
-{
-  if (m_conn == nullptr)
-    return;
-
-  if (m_conn->state() == QTcpSocket::ConnectedState)
-    m_conn->disconnectFromHost();
-}
-
 PeerId Peer::id() const
 {
   return m_id;
@@ -106,9 +97,10 @@ void Peer::setConn(QTcpSocket *conn)
   }
 }
 
-void Peer::setup()
+void Peer::setupHandler()
 {
   connect(m_conn, &QTcpSocket::readyRead, this, &Peer::handle);
+  activate();
 }
 
 void Peer::close()
@@ -144,6 +136,7 @@ void Peer::sendMsg(QString txt) // reimplement
 
 void Peer::sendMsg(Message msg) // reimplement
 {
+  qWarning() << "m_conn is" << m_conn->state();
   qint64 bytes = m_conn->write(msg.toBytes());
   qWarning() << "Bytes written:" << bytes << ". Success? " << (bytes != -1);
   emit msgSent(msg.text(), bytes != -1);
@@ -184,4 +177,5 @@ void Peer::setupConnection()
   connect(m_conn, &QTcpSocket::connected, this, &Peer::activate);
   connect(m_conn, &QTcpSocket::disconnected, this, &Peer::deactivate);
   connect(m_conn, &QTcpSocket::errorOccurred, this, &Peer::deactivate);
+  connect(m_conn, &QTcpSocket::deleteLater, m_conn, &QTcpSocket::disconnectFromHost);
 }

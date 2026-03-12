@@ -28,7 +28,6 @@ private:
 public:
   explicit Peer(QTcpSocket *conn, QObject *parent = nullptr);
   explicit Peer(QObject *parent = nullptr);
-  ~Peer();
 
   PeerId id() const;
   QString name() const;
@@ -42,7 +41,7 @@ public:
   void setPort(int port);
   void setConn(QTcpSocket *conn = new QTcpSocket);
 
-  void setup();
+  void setupHandler();
   void close();
 
   bool setAddressAndPort(QString address, int port);

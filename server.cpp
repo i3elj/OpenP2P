@@ -29,7 +29,7 @@ void Server::finalizePeerConnection(Peer *peer)
   }
 
   peer->setupConnection();
-  peer->setup();
+  peer->setupHandler();
   emit peerConnectionFinalized(peer);
 }
 
@@ -56,7 +56,6 @@ void Server::tryReconnecting(Peer *peer)
   if (peer->isActive()) {
     emit peerAlreadyConnected(peer->id());
   } else {
-    peer->setConn();
     peer->connectToHost();
     exchangeData(peer);
   }
@@ -162,7 +161,7 @@ void Server::handleNewConnection()
         Message res(Message::Type::Accept);
         res.setMetaData(m_user->name(), m_user->port());
         sessPeer->sendMsg(res);
-        sessPeer->setup();
+        sessPeer->setupHandler();
         peer->deleteLater();
         return;
       }
