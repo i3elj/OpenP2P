@@ -29,6 +29,7 @@ qt_add_qml_module(openp2p
   SOURCES typedefs.h
   SOURCES self.h self.cpp
   SOURCES message.h message.cpp
+  SOURCES chatlistmodel.h chatlistmodel.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
