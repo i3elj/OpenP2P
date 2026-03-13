@@ -1,6 +1,27 @@
 #+title: TODO
 
-* TODO <<DEBUG>>
+* TODO Add cryptography                                                :#2:
+* DONE Load and save chat
+right now I'm proposing peers to have the chat as an attribute and session manager will actually update it or not, save it or not, load it or not, etc...
+
+** <<UPDATE 2026-03-12>> Messages are now handled by peers themselves
++The loading and saving needs polishing (it doesn't work, but it doesn't crash either).+
+It just wasn't saving it actually.
+
+I noticed two bugs:
+
+*** <<BUG>> peer is already connected and online
+this bug appeared when I opened the app and there was already a saved peer but it wasn't actually online and connected
+
+*** <<BUG>> signal not found
+the following error appeared out of nowhere:
+#+begin_src bash
+qt.core.qobject.connect: QObject::connect(QTcpSocket, QTcpSocket): signal not found
+#+end_src
+find out what's going on.
+
+* DONE Automatic reconnections
+* DONE <<DEBUG>>
 1. A starts
 2. B starts
 3. B connects to A
@@ -13,9 +34,7 @@
    4. B crashes (segmentation fault) at
       #+begin_src c++
         void Peer::sendMsg(Message msg) {
-          qint64 bytes = m_conn->write(msg.toBytes()); <<<< segfaults
+          qint64 bytes = m_conn->write(msg.toBytes()); // <<<< segfaults
         }
       #+end_src
 
-* TODO Add cryptography                                                :#2:
-* TODO Automatic reconnections                                         :#1:
