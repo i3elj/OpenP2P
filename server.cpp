@@ -15,7 +15,7 @@ void Server::onRemoteRejected(Peer *peer)
 void Server::onRemoteAccepted(Peer *peer, Message acceptMsg)
 {
   peer->setName(acceptMsg.hostName());
-  peer->setPort(acceptMsg.Port());
+  peer->setPort(acceptMsg.port());
   finalizePeerConnection(peer);
 }
 

@@ -20,10 +20,17 @@ public:
   QByteArray toBytes();
   void setMetaData(QString name, int port);
 
-  QString text();
+  QString text() const;
+  bool sent() const;
   QString hostName() const;
-  int Port() const;
+  int port() const;
   Message::Type type() const;
+
+  void setText(QString txt);
+  void setSent(bool sent);
+  void setHostName(QString name);
+  void setPort(int port);
+  void setType(Message::Type type);
 
 private:
   QString m_text;

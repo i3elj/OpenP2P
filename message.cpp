@@ -1,20 +1,35 @@
 #include "message.h"
 #include "self.h"
 
-Message::Message() {}
+Message::Message()
+  : m_text("")
+  , m_sent(false)
+  , m_hostName("")
+  , m_port(0)
+  , m_type(Type::Common)
+{}
 
 Message::Message(Type t)
-  : m_type(t)
+  : m_text("")
+  , m_sent(false)
+  , m_hostName("")
+  , m_port(0)
+  , m_type(t)
 {}
 
 Message::Message(QString name)
-  : m_hostName(name)
-  , m_type(Type::DataExchange)
+  : m_text("")
+  , m_sent(false)
+  , m_hostName(name)
+  , m_port(0)
+  , m_type(Type::Common)
 {}
 
 Message::Message(bool sent, QString msg)
   : m_text(msg)
   , m_sent(sent)
+  , m_hostName("")
+  , m_port(0)
   , m_type(Type::Common)
 {}
 
@@ -35,8 +50,7 @@ Message::Message(QByteArray data)
   }
 }
 
-QJsonObject Message::toJson()
-{
+QJsonObject Message::toJson() {
   QJsonObject json{{Self::SettingsKeys::Type, m_type}};
 
   switch (m_type) {
@@ -58,33 +72,31 @@ QJsonObject Message::toJson()
   return json;
 }
 
-QByteArray Message::toBytes()
-{
+QByteArray Message::toBytes() {
   return QJsonDocument(toJson()).toJson(QJsonDocument::Compact);
 }
 
-void Message::setMetaData(QString name, int port)
-{
+void Message::setMetaData(QString name, int port) {
   m_hostName = name;
   m_port = port;
 }
 
-QString Message::text()
-{
-  return m_text;
-}
+bool Message::sent() const { return m_sent; }
 
-QString Message::hostName() const
-{
-  return m_hostName;
-}
+QString Message::text() const { return m_text; }
 
-int Message::Port() const
-{
-  return m_port;
-}
+QString Message::hostName() const { return m_hostName; }
 
-Message::Type Message::type() const
-{
-  return m_type;
-}
+int Message::port() const { return m_port; }
+
+Message::Type Message::type() const { return m_type; }
+
+void Message::setText(QString txt) { m_text = txt; }
+
+void Message::setSent(bool sent) { m_sent = sent; }
+
+void Message::setHostName(QString name) { m_hostName = name; }
+
+void Message::setPort(int port) { m_port = port; }
+
+void Message::setType(Message::Type type) { m_type = type; }
