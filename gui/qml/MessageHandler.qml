@@ -14,36 +14,25 @@ Frame {
 	required property PeerListModel peerModel
 
 	onPeerChanged: function () {
-		if (prevPeer === null) {
+		if (prevPeer !== null) {
+			prevPeer.saveChat()
 			prevPeer = peer
-		}
-
-		if (peer !== null) {
-			sessionManager.saveChat(prevPeer, msgModel)
-			let messages = sessionManager.loadChat(peer)
-			msgModel.clear()
-
-			if (messages.length > 0) {
-				msgModel.append(messages)
-			}
+			return
 		}
 
 		prevPeer = peer
+		// if (peer !== null) {
+		// 	prevPeer.saveChat()
+		// 	peer.loadChat()
+		// }
 	}
 
 	Connections {
 		target: peer
 
-		function onMsgSent(msg, success) {
-			if (!success) {
-				console.warn("Message not sent");
-				return;
-			}
-			chatList.addMessage(true, msg)
-		}
-
-		function onNewMsg(msg) {
-			chatList.addMessage(false, msg)
+		function onMsgSent(msg) {
+			msgInput.clear()
+			chatList.positionViewAtEnd()
 		}
 	}
 
@@ -56,9 +45,7 @@ Frame {
 			Layout.fillWidth: true
 			clip: true
 
-			model: ListModel {
-				id: msgModel
-			}
+			model: peer === null ? ListModel : peer.chatModel
 
 			delegate: Label {
 				text: model.text
@@ -67,14 +54,14 @@ Frame {
 				horizontalAlignment: model.sent ? Qt.AlignRight : Qt.AlignLeft
 			}
 
-			function addMessage(sent, text) {
-				let newMsg = {
-					"sent": sent,
-					"text": !text.endsWith("\n") ? text + "\n" : text
-				}
-				msgModel.append(newMsg)
-				chatList.positionViewAtEnd()
-			}
+			// function addMessage(sent, text) {
+			// 	let newMsg = {
+			// 		"sent": sent,
+			// 		"text": !text.endsWith("\n") ? text + "\n" : text
+			// 	}
+			// 	chatList.model.append(newMsg)
+			// 	chatList.positionViewAtEnd()
+			//}
 		}
 
 		RowLayout {
@@ -93,12 +80,12 @@ Frame {
 					Keys.onReturnPressed: sendMessage()
 
 					function sendMessage() {
-						if (msgInput.text.length === 0) {
-							return
-						}
+						let cleanMessage = msgInput.text.trim()
 
-						peer.sendMsg(msgInput.text)
-						msgInput.clear()
+						if (cleanMessage.length === 0)
+							return
+
+						peer.sendMsg(cleanMessage)
 					}
 				}
 			}

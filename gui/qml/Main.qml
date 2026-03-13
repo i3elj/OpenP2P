@@ -13,13 +13,19 @@ ApplicationWindow {
 		property Peer currentPeer: null
 		property PeerListModel peers: sessionManager.peers
 
-		Component.onCompleted: reconnectTimer.start()
+		Component.onCompleted: timer.start()
 
 		Timer {
-			id: reconnectTimer
+			id: timer
 			interval: 500
 			repeat: false
-			onTriggered: server.tryReconnectAll()
+			onTriggered: function() {
+				if (!sessionManager.loadChats()) {
+					console.warn("couldn't load peers chats")
+				}
+
+				server.tryReconnectAll()
+			}
 		}
 
 		PeerConnection {
