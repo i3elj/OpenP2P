@@ -10,8 +10,7 @@
  * Private functions.
  */
 
-bool SessionManager::loadSavedPeers()
-{
+bool SessionManager::loadSavedPeers() {
   QJsonArray peersArray = loadPeersFromFile();
 
   for (const QJsonValueRef &entry : peersArray) {
@@ -27,8 +26,7 @@ bool SessionManager::loadSavedPeers()
   return true;
 }
 
-bool SessionManager::savePeersToFile(QJsonArray peers)
-{
+bool SessionManager::savePeersToFile(QJsonArray peers) {
   QFile file(Self::savedPeersFilePath);
 
   if (!file.exists())
@@ -50,8 +48,7 @@ bool SessionManager::savePeersToFile(QJsonArray peers)
   return true;
 }
 
-QJsonArray SessionManager::loadPeersFromFile()
-{
+QJsonArray SessionManager::loadPeersFromFile() {
   QFile file(Self::savedPeersFilePath);
 
   if (!file.exists()) {
@@ -87,18 +84,13 @@ SessionManager::SessionManager(Self *user, QObject *parent)
   loadSavedPeers();
 }
 
-SessionManager::~SessionManager()
-{
-  saveAllPeers();
-}
+SessionManager::~SessionManager() { saveAllPeers(); }
 
-bool SessionManager::contains(PeerId peerid) const
-{
+bool SessionManager::contains(PeerId peerid) const {
   return m_peerMap.contains(peerid);
 }
 
-void SessionManager::addPeer(Peer *peer)
-{
+void SessionManager::addPeer(Peer *peer) {
   peer->setParent(this);
   m_peerMap.insert(peer->id(), peer);
   m_peerModel->addPeer(peer);
@@ -108,8 +100,7 @@ void SessionManager::addPeer(Peer *peer)
   }
 }
 
-void SessionManager::deletePeer(Peer *peer)
-{
+void SessionManager::deletePeer(Peer *peer) {
   m_peerMap.remove(peer->id());
 
   if (!saveAllPeers()) {
@@ -117,18 +108,13 @@ void SessionManager::deletePeer(Peer *peer)
   }
 }
 
-QHash<PeerId, Peer *> SessionManager::getAllPeers() const
-{
-  return m_peerMap;
-}
+QHash<PeerId, Peer *> SessionManager::getAllPeers() const { return m_peerMap; }
 
-Peer *SessionManager::getPeer(PeerId id) const
-{
+Peer *SessionManager::getPeer(PeerId id) const {
   return m_peerMap.value(id, nullptr);
 }
 
-bool SessionManager::saveAllPeers()
-{
+bool SessionManager::saveAllPeers() {
   QJsonArray arr;
 
   for (const auto &peer : m_peerMap) {
@@ -143,8 +129,7 @@ bool SessionManager::saveAllPeers()
   return savePeersToFile(arr);
 }
 
-bool SessionManager::savePeer(Peer *peer)
-{
+bool SessionManager::savePeer(Peer *peer) {
   QJsonArray peers = loadPeersFromFile();
   QJsonObject jsonPeer{{Self::SettingsKeys::Name, peer->name()},
                        {Self::SettingsKeys::Addr, peer->addr()},
@@ -162,13 +147,9 @@ bool SessionManager::savePeer(Peer *peer)
  * Q_INVOKABLE Functions.
  */
 
-PeerListModel *SessionManager::peers() const
-{
-  return m_peerModel;
-}
+PeerListModel *SessionManager::peers() const { return m_peerModel; }
 
-void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel)
-{
+void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel) {
   QHash<int, QByteArray> roles = msgModel->roleNames();
   int sentAttr = roles.key("sent");
   int textAttr = roles.key("text");
@@ -202,32 +183,38 @@ void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel)
   file.close();
 }
 
-QList<Message> SessionManager::loadChat(Peer *peer)
-{
-  QFile file(Self::userConfigDir + "/" + peer->name());
-  QList<Message> messages;
+bool SessionManager::loadChats() {
+  for (const auto &peer : m_peerMap) {
+    QFile file(Self::userConfigDir + "/" + peer->name());
+    QList<Message> messages;
 
-  if (!file.open(QIODevice::ReadOnly)) {
-    qErrnoWarning("Can't open file");
-    return messages;
+    if (!file.exists())
+      continue;
+
+    if (!file.open(QIODevice::ReadOnly)) {
+      qErrnoWarning("Can't open file");
+      return false;
+    }
+
+    QByteArray fileData = file.readAll();
+    file.close();
+
+    QJsonDocument doc = QJsonDocument::fromJson(fileData);
+    QJsonArray chat = doc.array();
+
+    for (const QJsonValue &json : chat) {
+      Message msg(json[Self::SettingsKeys::Sent].toBool(),
+                  json[Self::SettingsKeys::Text].toString());
+      msg.setType(static_cast<Message::Type>(json[Self::SettingsKeys::Type].toInt()));
+      messages.append(msg);
+    }
+
+    peer->loadMessages(messages);
   }
 
-  QByteArray fileData = file.readAll();
-  file.close();
-
-  QJsonDocument doc = QJsonDocument::fromJson(fileData);
-  QJsonArray chat = doc.array();
-
-  for (const QJsonValue &json : chat) {
-    Message msg(json[Self::SettingsKeys::Sent].toBool(), json[Self::SettingsKeys::Text].toString());
-    messages.append(msg);
-  }
-
-  return messages;
+  return true;
 }
 
-void SessionManager::addNewMsgTo(Peer *peer, bool sent, QString msg)
-{
+void SessionManager::addNewMsgTo(Peer *peer, bool sent, QString msg) {
   // todo
 }
-

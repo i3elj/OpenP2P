@@ -35,7 +35,7 @@ public:
 
   Q_INVOKABLE PeerListModel* peers() const;
   Q_INVOKABLE void saveChat(Peer *peer, QAbstractListModel *msgModel);
-  Q_INVOKABLE QList<Message> loadChat(Peer *peer);
+  Q_INVOKABLE bool loadChats();
   Q_INVOKABLE void addNewMsgTo(Peer *peer, bool sent, QString msg);
 
 signals:
