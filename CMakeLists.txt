@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
 find_package(Qt6 REQUIRED COMPONENTS Core)
 
 qt_standard_project_setup(REQUIRES 6.8)
@@ -45,6 +46,7 @@ set_target_properties(openp2p PROPERTIES
 
 target_link_libraries(openp2p PRIVATE Qt6::Quick)
 target_link_libraries(openp2p PRIVATE Qt6::Core)
+target_link_libraries(openp2p PRIVATE Qt6::QuickControls2)
 
 include(GNUInstallDirs)
 install(TARGETS openp2p
