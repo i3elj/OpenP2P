@@ -171,7 +171,7 @@ void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel) {
   if (!dir.exists())
     dir.mkpath(".");
 
-  QFile file(Self::userConfigDir + "/" + peer->name());
+  QFile file(Self::userConfigDir + peer->name());
 
   if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
     qErrnoWarning("Can't open file");
@@ -185,7 +185,7 @@ void SessionManager::saveChat(Peer *peer, QAbstractListModel *msgModel) {
 
 bool SessionManager::loadChats() {
   for (const auto &peer : m_peerMap) {
-    QFile file(Self::userConfigDir + "/" + peer->name());
+    QFile file(Self::userConfigDir + peer->name());
     QList<Message> messages;
 
     if (!file.exists())
