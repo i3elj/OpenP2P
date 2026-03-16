@@ -52,10 +52,11 @@ public:
   bool setAddressAndPort(QString address, int port);
   void connectToHost();
 
-  Q_INVOKABLE void sendMsg(QString txt);
   void sendMsg(Message msg);
   void loadMessages(QList<Message> messages);
-  void saveChat();
+
+  Q_INVOKABLE void sendMsg(QString txt);
+  Q_INVOKABLE void saveChat();
 
 public slots:
   void handle();

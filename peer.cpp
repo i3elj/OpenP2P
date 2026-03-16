@@ -111,22 +111,25 @@ bool Peer::setAddressAndPort(QString address, int port) {
 
 void Peer::connectToHost() { m_conn->connectToHost(m_addr, m_port); }
 
-// Q_INVOKABLE
-void Peer::sendMsg(QString text) { sendMsg(Message(true, text)); }
-
 void Peer::sendMsg(Message msg) {
   msg.setSent(true);
   qWarning() << "m_conn is" << m_conn->state();
   qint64 bytes = m_conn->write(msg.toBytes());
   qWarning() << "Bytes written:" << bytes << ". Success? " << (bytes != -1);
 
-  if (bytes != -1)
+  if (bytes != -1 && msg.type() == Message::Type::Common)
     emit msgSent(msg);
 }
 
 void Peer::loadMessages(QList<Message> messages) {
   m_chatModel->reset(messages);
 }
+
+/**
+ * Q_INVOKABLE FUNCTIONS
+ */
+
+void Peer::sendMsg(QString text) { sendMsg(Message(true, text)); }
 
 void Peer::saveChat() {
   QHash<int, QByteArray> roles = m_chatModel->roleNames();
@@ -150,7 +153,7 @@ void Peer::saveChat() {
   if (!dir.exists())
     dir.mkpath(".");
 
-  QFile file(Self::userConfigDir + "/" + m_name);
+  QFile file(Self::userConfigDir + m_name);
 
   if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
     qErrnoWarning("Can't open file");
@@ -175,8 +178,10 @@ void Peer::handle() {
     return;
   }
 
-  qWarning() << "Message received from" << m_name << ", said:" << req.text();
-  emit newMsg(req);
+  if (req.type() == Message::Type::Common) {
+    qWarning() << "Message received from" << m_name << ", said:" << req.text();
+    emit newMsg(req);
+  }
 }
 
 void Peer::activate() {
