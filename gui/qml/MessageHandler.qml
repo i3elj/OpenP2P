@@ -76,7 +76,7 @@ Frame {
 				TextArea {
 					id: msgInput
 					wrapMode: TextArea.Wrap
-					placeholderText: "Type your message here..."
+					placeholderText: "Digite sua mensagem aqui..."
 					Keys.onReturnPressed: sendMessage()
 
 					function sendMessage() {
@@ -91,7 +91,7 @@ Frame {
 			}
 
 			Button {
-				text: "Send"
+				text: "Enviar"
 				Layout.alignment: Qt.AlignTop
 				onClicked: msgInput.sendMessage()
 			}

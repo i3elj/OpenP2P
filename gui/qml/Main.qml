@@ -39,7 +39,7 @@ ApplicationWindow {
 		anchors.margins: 8
 		spacing: 32
 
-		Pane {
+		Frame {
 			id: sidebar
 			padding: 8
 			Layout.fillHeight: true
@@ -64,7 +64,8 @@ ApplicationWindow {
 
 				Text {
 					Layout.fillWidth: true
-					text: "Friend List"
+					text: "Lista de Amigos"
+					font.pixelSize: 16
 					horizontalAlignment: Text.AlignHCenter
 				}
 
@@ -76,35 +77,25 @@ ApplicationWindow {
 					focus: true
 					clip: true
 					model: root.peers
-					delegate: Component {
-						Item {
-							width: ListView.view.width
-							height: rowLayout.height + 8  // Add some padding
+					delegate: Item {
+						width: ListView.view.width
+						height: rowLayout.height + 8
 
-							MouseArea {
-								id: mouseArea
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									list.currentIndex = index
-									currentPeer = peers.at(index)
-								}
-							}
+						Rectangle {
+							id: background
+							anchors.fill: parent
+							color: mouseArea.containsMouse ? "#f0f0f0" : "transparent"
+							radius: 5
+						}
 
-							Rectangle {
-								id: background
-								anchors.fill: parent
-								color:
-										mouseArea.containsMouse ||
-										model.peer.name === currentPeer.name ? "#f0f0f0" : "transparent"
-								radius: 5
-							}
+						Pane {
+							padding: 8
+							background: null
+							anchors.verticalCenter: parent.verticalCenter
 
 							RowLayout {
 								id: rowLayout
-								anchors.centerIn: parent
-								spacing: 4
+								spacing: 8
 
 								Rectangle {
 									width: 10
@@ -116,6 +107,17 @@ ApplicationWindow {
 								Text {
 									text: model.peer.name
 								}
+							}
+						}
+
+						MouseArea {
+							id: mouseArea
+							anchors.fill: parent
+							hoverEnabled: true
+							cursorShape: Qt.PointingHandCursor
+							onClicked: {
+								list.currentIndex = index
+								currentPeer = peers.at(index)
 							}
 						}
 					}
@@ -134,7 +136,7 @@ ApplicationWindow {
 				spacing: 12
 
 				Label {
-					text: "Your IPv6:"
+					text: "IPv6:"
 				}
 
 				Column {
@@ -162,12 +164,12 @@ ApplicationWindow {
 
 						TextField {
 							id: selfPort
-							placeholderText: "Default port: 7575"
+							placeholderText: "Número da Porta (7575)"
 							Component.onCompleted: text = self.port
 						}
 
 						Button {
-							text: "Save"
+							text: "Salvar"
 							onClicked: self.port = selfPort.text
 						}
 					}
@@ -179,7 +181,7 @@ ApplicationWindow {
 				spacing: 12
 
 				Label {
-					text: "Your Name:"
+					text: "Seu Nome:"
 				}
 
 				TextField {
@@ -189,7 +191,7 @@ ApplicationWindow {
 				}
 
 				Button {
-					text: "Save"
+					text: "Salvar"
 					onClicked: self.name = selfName.text
 				}
 			}
@@ -199,17 +201,17 @@ ApplicationWindow {
 
 				TextField {
 					id: peerIP
-					placeholderText: "Peer's IP"
+					placeholderText: "IP do Amigo"
 					Layout.fillWidth: true
 				}
 
 				TextField {
 					id: peerPort
-					placeholderText: "7575"
+					placeholderText: "Número da Porta"
 				}
 
 				Button {
-					text: "Connect"
+					text: "Conectar"
 					onClicked: function () {
 						server.startNewConn(peerIP.text, Number(peerPort.text))
 					}
