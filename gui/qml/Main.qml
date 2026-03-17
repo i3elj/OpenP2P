@@ -37,7 +37,7 @@ ApplicationWindow {
 	RowLayout {
 		anchors.fill: parent
 		anchors.margins: 8
-		spacing: 32
+		spacing: 12
 
 		Frame {
 			id: sidebar
