@@ -29,9 +29,6 @@ bool SessionManager::loadSavedPeers() {
 bool SessionManager::savePeersToFile(QJsonArray peers) {
   QFile file(Self::savedPeersFilePath);
 
-  if (!file.exists())
-    m_user->createFiles();
-
   if (!file.open(QFile::WriteOnly)) {
     qWarning() << "Can't open file to save peers:" << file.errorString();
     return false;
@@ -50,10 +47,6 @@ bool SessionManager::savePeersToFile(QJsonArray peers) {
 
 QJsonArray SessionManager::loadPeersFromFile() {
   QFile file(Self::savedPeersFilePath);
-
-  if (!file.exists()) {
-    m_user->createFiles();
-  }
 
   if (!file.open(QIODevice::ReadOnly)) {
     qWarning() << "Something went wrong while reading saved files:" << file.errorString();

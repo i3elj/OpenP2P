@@ -30,12 +30,13 @@ public:
 
   static QString userConfigDir;
   static QString savedPeersFilePath;
+  static void createFiles();
+
   explicit Self(QObject *parent = nullptr);
   QString name() const;
   void setName(QString newName);
   int port() const;
   void setPort(int port);
-  void createFiles() const;
 
 signals:
   void nameChanged();

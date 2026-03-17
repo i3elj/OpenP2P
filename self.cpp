@@ -5,8 +5,24 @@
 #include <QStandardPaths>
 #include "peer.h"
 
-QString Self::userConfigDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/OpenP2P/";
-QString Self::savedPeersFilePath = Self::userConfigDir + "saved_peers.json";
+QString Self::userConfigDir;
+QString Self::savedPeersFilePath;
+
+void Self::createFiles()
+{
+  QDir dir(userConfigDir);
+  QFile file(savedPeersFilePath);
+
+  if (!dir.exists()) {
+    dir.mkpath(userConfigDir);
+  }
+
+  if (file.open(QIODevice::Append)) {
+    file.close();
+  } else {
+    qWarning() << "Couldn't create files:" << file.errorString();
+  }
+}
 
 Self::Self(QObject *parent)
   : QObject{parent}
@@ -40,19 +56,5 @@ void Self::setPort(int port)
     m_port = port;
     m_settings->setValue("port", m_port);
     emit portChanged();
-  }
-}
-
-void Self::createFiles() const
-{
-  QDir dir;
-  QFile file(savedPeersFilePath);
-
-  if (!dir.exists(userConfigDir)) {
-    dir.mkdir(userConfigDir);
-  }
-
-  if (file.open(QIODevice::Append)) {
-    file.close();
   }
 }

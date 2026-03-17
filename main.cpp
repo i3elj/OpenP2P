@@ -1,7 +1,9 @@
+#include <QDir>
 #include <QGuiApplication>
 #include <QObject>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QStandardPaths>
 #include "gui/addrlabel.h"
 #include "peer.h"
 #include "self.h"
@@ -17,15 +19,21 @@ int main(int argc, char *argv[])
   QCoreApplication::setOrganizationName("i3elj");
   QCoreApplication::setOrganizationDomain("i3elj.com");
 
-  QString instance = "1";
+  int instance = 0;
 
   for (int i = 0; i < argc; i++) {
     if (QString(argv[i]).startsWith("--instance=")) {
-      instance = QString(argv[i]).mid(10);
+      instance = QString(argv[i]).sliced(11).toInt();
+      break;
     }
   }
 
-  QCoreApplication::setApplicationName(APP + QString("-") + instance);
+  QString appname = APP + (instance != 0 ? QString("-") + QString::number(instance) : "");
+  QCoreApplication::setApplicationName(appname);
+
+  Self::userConfigDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/";
+  Self::savedPeersFilePath = Self::userConfigDir + "saved_peers.json";
+  Self::createFiles();
 
   Self self(&app);
   SessionManager sm(&self, &app);
