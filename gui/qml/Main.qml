@@ -43,7 +43,7 @@ ApplicationWindow {
 			id: sidebar
 			padding: 8
 			Layout.fillHeight: true
-			Layout.minimumWidth: list.contentItem.childrenRect.width + (padding * 2)
+			Layout.minimumWidth: list.implicitWidth + (padding * 2)
 
 			Connections {
 				target: server
