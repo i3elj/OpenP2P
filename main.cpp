@@ -4,6 +4,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QStandardPaths>
+#include <QQuickStyle>
 #include "gui/addrlabel.h"
 #include "peer.h"
 #include "self.h"
@@ -15,6 +16,10 @@
 int main(int argc, char *argv[])
 {
   QGuiApplication app(argc, argv);
+
+#ifdef __WIN32
+  QQuickStyle::setStyle("FluentWinUI3");
+#endif
 
   QCoreApplication::setOrganizationName("i3elj");
   QCoreApplication::setOrganizationDomain("i3elj.com");
