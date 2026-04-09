@@ -9,6 +9,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
 find_package(Qt6 REQUIRED COMPONENTS Core)
+
+if (${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
+  set(OPENSSL_ROOT_DIR "C:/msys64/mingw64")
+endif()
+
+set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.8)
@@ -46,10 +52,15 @@ set_target_properties(openp2p PROPERTIES
   WIN32_EXECUTABLE TRUE
 )
 
-target_link_libraries(openp2p PRIVATE Qt6::Quick)
-target_link_libraries(openp2p PRIVATE Qt6::Core)
-target_link_libraries(openp2p PRIVATE Qt6::QuickControls2)
-target_link_libraries(openp2p PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(openp2p PRIVATE
+  Qt6::Quick
+  Qt6::Core
+  Qt6::QuickControls2
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  -static-libgcc
+  -static-libstdc++
+)
 
 include(GNUInstallDirs)
 install(TARGETS openp2p
