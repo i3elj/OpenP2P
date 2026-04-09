@@ -5,8 +5,8 @@ import App
 
 ApplicationWindow {
 	id: root
-	minimumWidth: 1080
-	minimumHeight: 720
+	width: 1080
+	height: 720
 	visible: true
 	title: qsTr("OpenP2P")
 
