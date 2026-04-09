@@ -1,6 +1,25 @@
 #+title: TODO
 
-* TODO Add cryptography                                                :#2:
+* TODO Add cryptography
+The cryptography chosen was RSA (private and public key). To make it work I decided to use OpenSSL lib. Right now I can encrypt, decrypt and go from EVP_PKEY type to QString.
+
+- [X] Check exchange data procedure (It shouldn't contain cryptography)
+  1) Self connect to peer (not saved)
+     1. Server::startNewConn()
+     2. exchangeData()
+     3. connect: TcpSocket::connected () -> ?????
+     4. connect: TcpSocket::readyRead () -> ?????
+  2) Self connect to peer (saved)
+     1. exchangeData()
+        ...
+  3) Peer connect to self (both)
+     1. Serve::handleNewConnection()
+     2. connect: QTcpSocket::readyRead () -> ?????
+- [X] Check exchange of messages (It should contain cryptography)
+- [-] Test it to see if it works.
+  - [X] It works on linux?
+  - [ ] It works on windows?
+
 * DONE Load and save chat
 right now I'm proposing peers to have the chat as an attribute and session manager will actually update it or not, save it or not, load it or not, etc...
 

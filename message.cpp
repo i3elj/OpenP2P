@@ -33,20 +33,25 @@ Message::Message(bool sent, QString msg)
   , m_type(Type::Common)
 {}
 
-Message::Message(QByteArray data)
-{
+Message::Message(QByteArray data) {
   QJsonObject json(QJsonDocument::fromJson(data).object());
   m_type = Type(json[Self::SettingsKeys::Type].toInt());
 
   auto keys = json.keys();
-  if (keys.contains(Self::SettingsKeys::Name) && keys.contains(Self::SettingsKeys::Port)) {
-    m_hostName = json[Self::SettingsKeys::Name].toString();
-    m_port = json[Self::SettingsKeys::Port].toInt();
-  }
 
-  if (m_type == Common) {
+  switch (m_type) {
+  case Common:
     m_text = json[Self::SettingsKeys::Text].toString();
     m_sent = json[Self::SettingsKeys::Sent].toBool();
+    break;
+  case Accept:
+  case DataExchange:
+    m_hostName = json[Self::SettingsKeys::Name].toString();
+    m_port = json[Self::SettingsKeys::Port].toInt();
+    m_publicKey = json[Self::SettingsKeys::PublicKey].toString();
+    break;
+  default:
+    break;
   }
 }
 
@@ -63,6 +68,7 @@ QJsonObject Message::toJson() {
   case Accept:
     json[Self::SettingsKeys::Name] = m_hostName;
     json[Self::SettingsKeys::Port] = m_port;
+    json[Self::SettingsKeys::PublicKey] = m_publicKey;
     break;
 
   default:
@@ -76,9 +82,10 @@ QByteArray Message::toBytes() {
   return QJsonDocument(toJson()).toJson(QJsonDocument::Compact);
 }
 
-void Message::setMetaData(QString name, int port) {
+void Message::setMetaData(QString name, int port, QString publicKey) {
   m_hostName = name;
   m_port = port;
+  m_publicKey = publicKey;
 }
 
 bool Message::sent() const { return m_sent; }
@@ -90,6 +97,8 @@ QString Message::hostName() const { return m_hostName; }
 int Message::port() const { return m_port; }
 
 Message::Type Message::type() const { return m_type; }
+
+QString Message::publicKey() const { return m_publicKey; }
 
 void Message::setText(QString txt) { m_text = txt; }
 

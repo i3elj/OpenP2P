@@ -9,6 +9,7 @@ void Server::onRemoteRejected(Peer *peer)
   disconnect(peer->conn(), &QTcpSocket::connected, nullptr, nullptr);
   disconnect(peer->conn(), &QTcpSocket::readyRead, nullptr, nullptr);
   m_session->deletePeer(peer);
+  m_session->saveAllPeers();
   peer->deleteLater();
 }
 
@@ -16,6 +17,7 @@ void Server::onRemoteAccepted(Peer *peer, Message acceptMsg)
 {
   peer->setName(acceptMsg.hostName());
   peer->setPort(acceptMsg.port());
+  peer->setPublicKey(acceptMsg.publicKey());
   finalizePeerConnection(peer);
 }
 
@@ -37,8 +39,8 @@ void Server::exchangeData(Peer *peer)
 {
   connect(peer->conn(), &QTcpSocket::connected, this, [this, peer]() {
     Message req(Message::Type::DataExchange);
-    req.setMetaData(m_user->name(), m_user->port());
-    peer->sendMsg(req);
+    req.setMetaData(m_user->name(), m_user->port(), m_user->pubKeyStr());
+    peer->sendMsg(req, false);
   });
 
   connect(peer->conn(), &QTcpSocket::readyRead, this, [this, peer]() {
@@ -56,8 +58,8 @@ void Server::tryReconnecting(Peer *peer)
   if (peer->isActive()) {
     emit peerAlreadyConnected(peer->id());
   } else {
-    peer->connectToHost();
     exchangeData(peer);
+    peer->connectToHost();
   }
 }
 
@@ -71,7 +73,7 @@ Server::Server(Self *user, SessionManager *sm, QObject *parent)
   , m_session(sm)
   , m_user(user)
 {
-  AddressList addresses = m_ipr->resolve();
+  QList<QHostAddress> addresses = m_ipr->resolve();
   listen(addresses.first(), m_user->port());
 }
 
@@ -95,8 +97,8 @@ void Server::acceptIncomingPeer(Peer *peer)
 {
   finalizePeerConnection(peer);
   Message res(Message::Type::Accept);
-  res.setMetaData(m_user->name(), m_user->port());
-  peer->sendMsg(res);
+  res.setMetaData(m_user->name(), m_user->port(), m_user->pubKeyStr());
+  peer->sendMsg(res, false);
   peer->activate();
 }
 
@@ -118,7 +120,7 @@ void Server::startNewConn(QString address, int port)
     return;
   }
 
-  Peer *peer = new Peer(this);
+  Peer *peer = new Peer(m_user, this);
 
   if (!peer->setAddressAndPort(address, port)) {
     emit wrongAddress(address);
@@ -137,15 +139,15 @@ void Server::startNewConn(QString address, int port)
 void Server::handleNewConnection()
 {
   QTcpSocket *conn = nextPendingConnection();
-  Peer *peer = new Peer(conn, this);
+  Peer *peer = new Peer(m_user, conn, this);
 
   connect(peer->conn(), &QTcpSocket::readyRead, this, [this, peer]() {
     Message req(peer->conn()->readAll());
 
     if (req.type() == Message::Type::DataExchange) {
-      auto json = req.toJson();
-      peer->setName(json[Self::SettingsKeys::Name].toString());
-      peer->setPort(json[Self::SettingsKeys::Port].toInt());
+      peer->setName(req.hostName());
+      peer->setPort(req.port());
+      peer->setPublicKey(req.publicKey());
 
       Peer *sessPeer = m_session->getPeer(peer->id());
 
@@ -158,9 +160,10 @@ void Server::handleNewConnection()
 
         disconnect(peer->conn(), &QTcpSocket::readyRead, nullptr, nullptr);
         sessPeer->setConn(peer->conn());
+        sessPeer->setPublicKey(peer->publicKey());
         Message res(Message::Type::Accept);
-        res.setMetaData(m_user->name(), m_user->port());
-        sessPeer->sendMsg(res);
+        res.setMetaData(m_user->name(), m_user->port(), m_user->pubKeyStr());
+        sessPeer->sendMsg(res, false);
         sessPeer->setupHandler();
         peer->deleteLater();
         return;

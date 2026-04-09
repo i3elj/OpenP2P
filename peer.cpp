@@ -5,7 +5,7 @@
 #include "message.h"
 #include "self.h"
 
-Peer::Peer(QTcpSocket *conn, QObject *parent)
+Peer::Peer(Self* user, QTcpSocket *conn, QObject *parent)
   : QObject{parent}
   , m_id()
   , m_name("")
@@ -14,6 +14,9 @@ Peer::Peer(QTcpSocket *conn, QObject *parent)
   , m_conn(conn)
   , m_active(false)
   , m_chatModel(new ChatListModel(this))
+  , m_user(user)
+  , m_pubKey(nullptr)
+  , m_crypto()
 {
   m_conn->setParent(this);
   m_addr = m_conn->peerAddress();
@@ -22,7 +25,7 @@ Peer::Peer(QTcpSocket *conn, QObject *parent)
   connect(this, &Peer::newMsg, m_chatModel, &ChatListModel::add);
 }
 
-Peer::Peer(QObject *parent)
+Peer::Peer(Self *user, QObject *parent)
   : QObject{parent}
   , m_id()
   , m_name("")
@@ -31,13 +34,19 @@ Peer::Peer(QObject *parent)
   , m_conn(new QTcpSocket(this))
   , m_active(false)
   , m_chatModel(new ChatListModel(this))
+  , m_user(user)
+  , m_pubKey(nullptr)
+  , m_crypto()
 {
   connect(this, &Peer::connectionChanged, this, &Peer::setupConnection);
   connect(this, &Peer::msgSent, m_chatModel, &ChatListModel::add);
   connect(this, &Peer::newMsg, m_chatModel, &ChatListModel::add);
 }
 
-Peer::~Peer() { saveChat(); }
+Peer::~Peer() {
+  EVP_PKEY_free(m_pubKey);
+  saveChat();
+}
 
 PeerId Peer::id() const { return m_id; }
 
@@ -52,6 +61,8 @@ QTcpSocket *Peer::conn() const { return m_conn; }
 bool Peer::isActive() const { return m_active; }
 
 ChatListModel *Peer::chatModel() const { return m_chatModel; }
+
+QString Peer::publicKey() const { return m_crypto.keyToPEM(m_pubKey); }
 
 void Peer::setName(QString n) {
   if (m_name == n)
@@ -86,6 +97,18 @@ void Peer::setConn(QTcpSocket *conn) {
   }
 }
 
+void Peer::setPublicKey(QString keyStr) {
+  EVP_PKEY *key = m_crypto.PEMtoKey(keyStr);
+
+  if (!key) {
+    qWarning() << "Provided key is improper or incorrect";
+    return;
+  }
+
+  EVP_PKEY_free(m_pubKey);
+  m_pubKey = key;
+}
+
 void Peer::setupHandler() {
   connect(m_conn, &QTcpSocket::readyRead, this, &Peer::handle);
   activate();
@@ -111,11 +134,11 @@ bool Peer::setAddressAndPort(QString address, int port) {
 
 void Peer::connectToHost() { m_conn->connectToHost(m_addr, m_port); }
 
-void Peer::sendMsg(Message msg) {
+void Peer::sendMsg(Message msg, bool encrypt) {
   msg.setSent(true);
-  qWarning() << "m_conn is" << m_conn->state();
-  qint64 bytes = m_conn->write(msg.toBytes());
-  qWarning() << "Bytes written:" << bytes << ". Success? " << (bytes != -1);
+  QByteArray byteMsg = msg.toBytes();
+  QByteArray data = encrypt ? m_user->encrypt(m_pubKey, byteMsg) : byteMsg;
+  qint64 bytes = m_conn->write(data);
 
   if (bytes != -1 && msg.type() == Message::Type::Common)
     emit msgSent(msg);
@@ -129,7 +152,7 @@ void Peer::loadMessages(QList<Message> messages) {
  * Q_INVOKABLE FUNCTIONS
  */
 
-void Peer::sendMsg(QString text) { sendMsg(Message(true, text)); }
+void Peer::sendMsg(QString text) { sendMsg(Message(true, text), true); }
 
 void Peer::saveChat() {
   QHash<int, QByteArray> roles = m_chatModel->roleNames();
@@ -170,7 +193,9 @@ void Peer::saveChat() {
  */
 
 void Peer::handle() {
-  Message req(m_conn->readAll());
+  QByteArray data(m_conn->readAll());
+  Message req(m_user->decrypt(data));
+  // Message req(m_conn->readAll());
   req.setSent(false);
 
   if (req.type() == Message::Type::DataExchange) {

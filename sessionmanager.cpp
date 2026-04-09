@@ -15,7 +15,7 @@ bool SessionManager::loadSavedPeers() {
 
   for (const QJsonValueRef &entry : peersArray) {
     QJsonObject json = entry.toObject();
-    Peer *peer = new Peer(this);
+    Peer *peer = new Peer(m_user, this);
     peer->setName(json[Self::SettingsKeys::Name].toString());
     peer->setAddr(json[Self::SettingsKeys::Addr].toString());
     peer->setPort(json[Self::SettingsKeys::Port].toInt());

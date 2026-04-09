@@ -18,13 +18,14 @@ public:
 
   QJsonObject toJson();
   QByteArray toBytes();
-  void setMetaData(QString name, int port);
+  void setMetaData(QString name, int port, QString publicKey);
 
   QString text() const;
   bool sent() const;
   QString hostName() const;
   int port() const;
   Message::Type type() const;
+  QString publicKey() const;
 
   void setText(QString txt);
   void setSent(bool sent);
@@ -37,6 +38,7 @@ private:
   bool m_sent;
   QString m_hostName;
   int m_port;
+  QString m_publicKey;
   Message::Type m_type;
 };
 
