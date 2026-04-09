@@ -1,4 +1,4 @@
-#include "peerlistmodel.h"
+#include "gui/peerlistmodel.h"
 
 PeerListModel::PeerListModel(QObject *parent)
   : QAbstractListModel(parent)
