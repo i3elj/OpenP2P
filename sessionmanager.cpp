@@ -93,13 +93,7 @@ void SessionManager::addPeer(Peer *peer) {
   }
 }
 
-void SessionManager::deletePeer(Peer *peer) {
-  m_peerMap.remove(peer->id());
-
-  if (!saveAllPeers()) {
-    qWarning() << "Couldn't save peers";
-  }
-}
+void SessionManager::deletePeer(Peer *peer) { m_peerMap.remove(peer->id()); }
 
 QHash<PeerId, Peer *> SessionManager::getAllPeers() const { return m_peerMap; }
 
@@ -111,8 +105,6 @@ bool SessionManager::saveAllPeers() {
   QJsonArray arr;
 
   for (const auto &peer : m_peerMap) {
-    if (!peer)
-      continue;
     QJsonObject json{{Self::SettingsKeys::Name, peer->name()},
                      {Self::SettingsKeys::Addr, peer->addr()},
                      {Self::SettingsKeys::Port, peer->port()}};
