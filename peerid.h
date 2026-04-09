@@ -4,6 +4,7 @@
 #include <QHostAddress>
 #include <QJsonObject>
 #include <QTcpSocket>
+#include "self.h"
 
 struct PeerId
 {
@@ -22,14 +23,14 @@ struct PeerId
   QJsonObject toJson() const
   {
     QJsonObject obj;
-    obj["addr"] = addr.toString();
-    obj["port"] = port;
+    obj[Self::SettingsKeys::Addr] = addr.toString();
+    obj[Self::SettingsKeys::Port] = port;
     return obj;
   }
 
   static PeerId fromJson(QJsonValue json)
   {
-    return PeerId(QHostAddress(json["addr"].toString()), json["port"].toInt());
+    return PeerId(QHostAddress(json[Self::SettingsKeys::Addr].toString()), json["port"].toInt());
   }
 };
 
