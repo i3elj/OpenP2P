@@ -3,7 +3,6 @@
 
 #include <QHostAddress>
 #include <QObject>
-#include "typedefs.h"
 
 class IPv6AddrResolver : public QObject
 {
@@ -11,7 +10,7 @@ class IPv6AddrResolver : public QObject
 
 public:
   explicit IPv6AddrResolver(QObject *parent = nullptr);
-  AddressList resolve();
+  QList<QHostAddress> resolve();
 
 signals:
   void finished(QStringList ips);

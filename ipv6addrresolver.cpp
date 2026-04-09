@@ -5,9 +5,9 @@ IPv6AddrResolver::IPv6AddrResolver(QObject *parent)
   : QObject{parent}
 {}
 
-AddressList IPv6AddrResolver::resolve()
+QList<QHostAddress> IPv6AddrResolver::resolve()
 {
-  AddressList list;
+  QList<QHostAddress> list;
   QStringList emittedList;
 
   for (const QNetworkInterface &iface : QNetworkInterface::allInterfaces()) {
