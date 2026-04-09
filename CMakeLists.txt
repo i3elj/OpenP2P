@@ -9,6 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
 find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(OpenSSL REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -20,17 +21,18 @@ qt_add_qml_module(openp2p
   QML_FILES gui/qml/MessageHandler.qml
   QML_FILES gui/qml/PeerConnection.qml
   SOURCES gui/addrlabel.h gui/addrlabel.cpp
+  SOURCES gui/peerlistmodel.h gui/peerlistmodel.cpp
+  SOURCES gui/chatlistmodel.h gui/chatlistmodel.cpp
   SOURCES ipv6addrresolver.h ipv6addrresolver.cpp
   SOURCES server.h server.cpp
   SOURCES peer.h peer.cpp
   SOURCES peerid.h
-  SOURCES peerlistmodel.h peerlistmodel.cpp
   RESOURCES todo.org
   SOURCES sessionmanager.h sessionmanager.cpp
   SOURCES typedefs.h
   SOURCES self.h self.cpp
   SOURCES message.h message.cpp
-  SOURCES chatlistmodel.h chatlistmodel.cpp
+  SOURCES crypto.h crypto.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -47,6 +49,7 @@ set_target_properties(openp2p PROPERTIES
 target_link_libraries(openp2p PRIVATE Qt6::Quick)
 target_link_libraries(openp2p PRIVATE Qt6::Core)
 target_link_libraries(openp2p PRIVATE Qt6::QuickControls2)
+target_link_libraries(openp2p PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 include(GNUInstallDirs)
 install(TARGETS openp2p
