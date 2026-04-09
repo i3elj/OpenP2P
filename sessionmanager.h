@@ -1,10 +1,9 @@
 #ifndef SESSIONMANAGER_H
 #define SESSIONMANAGER_H
 
-#include "message.h"
 #include "peer.h"
 #include "self.h"
-#include "peerlistmodel.h"
+#include "gui/peerlistmodel.h"
 #include <QAbstractItemModel>
 #include <QObject>
 
