@@ -58,8 +58,6 @@ target_link_libraries(openp2p PRIVATE
   Qt6::QuickControls2
   OpenSSL::SSL
   OpenSSL::Crypto
-  -static-libgcc
-  -static-libstdc++
 )
 
 include(GNUInstallDirs)
