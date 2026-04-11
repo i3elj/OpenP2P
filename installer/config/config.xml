@@ -3,7 +3,7 @@
     <Name>OpenP2P</Name>
     <Version>1.0.0</Version>
     <Title>OpenP2P Installer</Title>
-    <Publisher>YourName</Publisher>
+    <Publisher>i3elj</Publisher>
     <StartMenuDir>OpenP2P</StartMenuDir>
     <TargetDir>@HomeDir@/OpenP2P</TargetDir>
 </Installer>
