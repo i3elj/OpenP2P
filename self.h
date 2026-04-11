@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QSettings>
 #include "crypto.h"
+#include "ipv6addrresolver.h"
 
 class Self : public QObject
 {
@@ -14,7 +15,9 @@ class Self : public QObject
 
 private:
   QSettings *m_settings;
+  IPv6AddrResolver* m_ipr;
   QString m_name;
+  QHostAddress m_address;
   int m_port;
   EVP_PKEY *m_pkey;
   Crypto m_crypto;
@@ -37,6 +40,7 @@ public:
   explicit Self(QObject *parent = nullptr);
   ~Self();
   QString name() const;
+  QHostAddress address() const;
   int port() const;
   const EVP_PKEY *pubKey() const;
   QString pubKeyStr() const;

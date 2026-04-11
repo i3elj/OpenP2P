@@ -69,12 +69,11 @@ void Server::tryReconnecting(Peer *peer)
 
 Server::Server(Self *user, SessionManager *sm, QObject *parent)
   : QTcpServer{parent}
-  , m_ipr(new IPv6AddrResolver(this))
   , m_session(sm)
   , m_user(user)
 {
-  QList<QHostAddress> addresses = m_ipr->resolve();
-  listen(addresses.first(), m_user->port());
+  listen(m_user->address(), m_user->port());
+  connect(m_user, &Self::portChanged, this, &Server::restartServer);
 }
 
 void Server::initTcpSocket()
@@ -172,4 +171,9 @@ void Server::handleNewConnection()
       emit newConnection(peer);
     }
   });
+}
+
+void Server::restartServer() {
+  close();
+  listen(m_user->address(), m_user->port());
 }

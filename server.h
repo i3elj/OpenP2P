@@ -1,7 +1,6 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "ipv6addrresolver.h"
 #include "peer.h"
 #include "sessionmanager.h"
 #include <QTcpServer>
@@ -12,7 +11,6 @@ class Server : public QTcpServer {
   Q_OBJECT
 
 private:
-  IPv6AddrResolver *m_ipr;
   SessionManager *m_session;
   Self *m_user;
 
@@ -33,6 +31,7 @@ public:
 
 public slots:
   void handleNewConnection();
+  void restartServer();
 
 signals:
   void newConnection(Peer *peer);

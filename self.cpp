@@ -27,7 +27,9 @@ void Self::createFiles() {
 Self::Self(QObject *parent)
   : QObject{parent}
   , m_settings(new QSettings(this))
+  , m_ipr(new IPv6AddrResolver(this))
   , m_name(m_settings->value(SettingsKeys::Name, "").toString())
+  , m_address(m_ipr->resolve().first())
   , m_port(m_settings->value(SettingsKeys::Port, 7755).toInt())
   , m_pkey(nullptr)
   , m_crypto(this)
@@ -35,21 +37,13 @@ Self::Self(QObject *parent)
   m_pkey = m_crypto.generateKey();
 }
 
-Self::~Self() {
-  EVP_PKEY_free(m_pkey);
-}
+Self::~Self() { EVP_PKEY_free(m_pkey); }
 
 QString Self::name() const {
   return m_settings->value(SettingsKeys::Name, m_name).toString();
 }
 
-void Self::setName(QString newName) {
-  if (m_name != newName) {
-    m_name = newName;
-    m_settings->setValue(SettingsKeys::Name, m_name);
-    emit nameChanged();
-  }
-}
+QHostAddress Self::address() const { return m_address; }
 
 int Self::port() const {
   return m_settings->value(SettingsKeys::Port, m_port).toInt();
@@ -58,6 +52,14 @@ int Self::port() const {
 const EVP_PKEY *Self::pubKey() const { return m_pkey; }
 
 QString Self::pubKeyStr() const { return m_crypto.keyToPEM(m_pkey); }
+
+void Self::setName(QString newName) {
+  if (m_name != newName) {
+    m_name = newName;
+    m_settings->setValue(SettingsKeys::Name, m_name);
+    emit nameChanged();
+  }
+}
 
 void Self::setPort(int port) {
   if (m_port != port) {
