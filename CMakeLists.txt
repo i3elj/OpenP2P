@@ -10,10 +10,6 @@ find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
 find_package(Qt6 REQUIRED COMPONENTS Core)
 
-if (${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
-  set(OPENSSL_ROOT_DIR "C:/msys64/mingw64")
-endif()
-
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 
@@ -41,6 +37,10 @@ qt_add_qml_module(openp2p
   SOURCES crypto.h crypto.cpp
 )
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_definitions(openp2p PRIVATE QT_QML_DEBUG)
+endif()
+
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
@@ -66,3 +66,10 @@ install(TARGETS openp2p
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+qt_generate_deploy_app_script(
+  TARGET openp2p
+  OUTPUT_SCRIPT deploy_script
+  NO_UNSUPPORTED_PLATFORM_ERROR
+)
+install(SCRIPT ${deploy_script})
