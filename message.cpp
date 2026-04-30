@@ -37,8 +37,6 @@ Message::Message(QByteArray data) {
   QJsonObject json(QJsonDocument::fromJson(data).object());
   m_type = Type(json[Self::SettingsKeys::Type].toInt());
 
-  auto keys = json.keys();
-
   switch (m_type) {
   case Common:
     m_text = json[Self::SettingsKeys::Text].toString();
