@@ -2,7 +2,6 @@
 #include <QDir>
 #include <QJsonArray>
 #include <QJsonObject>
-#include "message.h"
 #include "self.h"
 
 Peer::Peer(Self* user, QTcpSocket *conn, QObject *parent)
@@ -140,7 +139,7 @@ void Peer::sendMsg(Message msg, bool encrypt) {
   QByteArray data = encrypt ? m_user->encrypt(m_pubKey, byteMsg) : byteMsg;
   qint64 bytes = m_conn->write(data);
 
-  if (bytes != -1 && msg.type() == Message::Type::Common)
+  if (bytes != -1 && msg.type() == MessageType::Common)
     emit msgSent(msg);
 }
 
@@ -198,12 +197,12 @@ void Peer::handle() {
   // Message req(m_conn->readAll());
   req.setSent(false);
 
-  if (req.type() == Message::Type::DataExchange) {
+  if (req.type() == MessageType::DataExchange) {
     setName(req.hostName());
     return;
   }
 
-  if (req.type() == Message::Type::Common) {
+  if (req.type() == MessageType::Common) {
     qWarning() << "Message received from" << m_name << ", said:" << req.text();
     emit newMsg(req);
   }

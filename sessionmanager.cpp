@@ -93,7 +93,10 @@ void SessionManager::addPeer(Peer *peer) {
   }
 }
 
-void SessionManager::deletePeer(Peer *peer) { m_peerMap.remove(peer->id()); }
+void SessionManager::deletePeer(Peer *peer) {
+  m_peerMap.remove(peer->id());
+  m_peerModel->removePeer(peer);
+}
 
 QHash<PeerId, Peer *> SessionManager::getAllPeers() const { return m_peerMap; }
 
@@ -190,7 +193,7 @@ bool SessionManager::loadChats() {
     for (const QJsonValue &json : chat) {
       Message msg(json[Self::SettingsKeys::Sent].toBool(),
                   json[Self::SettingsKeys::Text].toString());
-      msg.setType(static_cast<Message::Type>(json[Self::SettingsKeys::Type].toInt()));
+      msg.setType(static_cast<MessageType>(json[Self::SettingsKeys::Type].toInt()));
       messages.append(msg);
     }
 

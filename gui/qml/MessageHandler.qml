@@ -8,6 +8,11 @@ Frame {
 	Layout.fillWidth: true
 	padding: 8
 	visible: peer !== null
+	background: Rectangle {
+		color: palette.light
+		border.color: palette.mid
+		border.width: 1
+	}
 
 	property Peer prevPeer
 	required property Peer peer

@@ -26,13 +26,13 @@ public:
   ~SessionManager();
   bool contains(PeerId peerid) const;
   void addPeer(Peer *peer);
-  void deletePeer(Peer *peer);
   Peer* getPeer(PeerId id) const;
   QHash<PeerId, Peer*> getAllPeers() const;
   bool saveAllPeers();
   bool savePeer(Peer *peer);
 
   Q_INVOKABLE PeerListModel* peers() const;
+  Q_INVOKABLE void deletePeer(Peer *peer);
   Q_INVOKABLE void saveChat(Peer *peer, QAbstractListModel *msgModel);
   Q_INVOKABLE bool loadChats();
   Q_INVOKABLE void addNewMsgTo(Peer *peer, bool sent, QString msg);

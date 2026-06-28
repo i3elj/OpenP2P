@@ -44,6 +44,11 @@ ApplicationWindow {
 			padding: 8
 			Layout.fillHeight: true
 			Layout.minimumWidth: list.implicitWidth + (padding * 2)
+			background: Rectangle {
+				color: palette.light
+				border.color: palette.mid
+				border.width: 1
+			}
 
 			Connections {
 				target: server
@@ -65,7 +70,8 @@ ApplicationWindow {
 				Text {
 					Layout.fillWidth: true
 					text: "Lista de Amigos"
-					font.pixelSize: 16
+					color: palette.text
+					font.pixelSize: 12
 					horizontalAlignment: Text.AlignHCenter
 				}
 
@@ -81,10 +87,17 @@ ApplicationWindow {
 						width: ListView.view.width
 						height: rowLayout.height + 8
 
+						ContextMenu.menu: Menu {
+							MenuItem {
+								text: qsTr("Remove")
+								onTriggered: sessionManager.deletePeer(model.peer)
+							}
+						}
+
 						Rectangle {
 							id: background
 							anchors.fill: parent
-							color: mouseArea.containsMouse ? "#f0f0f0" : "transparent"
+							color: mouseArea.containsMouse ? palette.highlight : "transparent"
 							radius: 5
 						}
 
@@ -101,11 +114,12 @@ ApplicationWindow {
 									width: 10
 									height: 10
 									radius: 100
-									color: model.peer.active ? "green" : "gray"
+									color: model.peer.active ? palette.active : palette.inactive
 								}
 
 								Text {
 									text: model.peer.name
+									color: palette.text
 								}
 							}
 						}
@@ -157,6 +171,7 @@ ApplicationWindow {
 								required property string modelData
 
 								text: modelData
+								color: palette.text
 								readOnly: true
 								selectByMouse: true
 							}

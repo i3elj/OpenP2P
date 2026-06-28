@@ -6,10 +6,10 @@ Message::Message()
   , m_sent(false)
   , m_hostName("")
   , m_port(0)
-  , m_type(Type::Common)
+  , m_type(MessageType::Common)
 {}
 
-Message::Message(Type t)
+Message::Message(MessageType t)
   : m_text("")
   , m_sent(false)
   , m_hostName("")
@@ -22,7 +22,7 @@ Message::Message(QString name)
   , m_sent(false)
   , m_hostName(name)
   , m_port(0)
-  , m_type(Type::Common)
+  , m_type(MessageType::Common)
 {}
 
 Message::Message(bool sent, QString msg)
@@ -30,12 +30,12 @@ Message::Message(bool sent, QString msg)
   , m_sent(sent)
   , m_hostName("")
   , m_port(0)
-  , m_type(Type::Common)
+  , m_type(MessageType::Common)
 {}
 
 Message::Message(QByteArray data) {
   QJsonObject json(QJsonDocument::fromJson(data).object());
-  m_type = Type(json[Self::SettingsKeys::Type].toInt());
+  m_type = MessageType(json[Self::SettingsKeys::Type].toInt());
 
   switch (m_type) {
   case Common:
@@ -94,7 +94,7 @@ QString Message::hostName() const { return m_hostName; }
 
 int Message::port() const { return m_port; }
 
-Message::Type Message::type() const { return m_type; }
+MessageType Message::type() const { return m_type; }
 
 QString Message::publicKey() const { return m_publicKey; }
 
@@ -106,4 +106,4 @@ void Message::setHostName(QString name) { m_hostName = name; }
 
 void Message::setPort(int port) { m_port = port; }
 
-void Message::setType(Message::Type type) { m_type = type; }
+void Message::setType(MessageType type) { m_type = type; }

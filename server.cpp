@@ -38,7 +38,7 @@ void Server::finalizePeerConnection(Peer *peer)
 void Server::exchangeData(Peer *peer)
 {
   connect(peer->conn(), &QTcpSocket::connected, this, [this, peer]() {
-    Message req(Message::Type::DataExchange);
+    Message req(MessageType::DataExchange);
     req.setMetaData(m_user->name(), m_user->port(), m_user->pubKeyStr());
     peer->sendMsg(req, false);
   });
@@ -46,9 +46,9 @@ void Server::exchangeData(Peer *peer)
   connect(peer->conn(), &QTcpSocket::readyRead, this, [this, peer]() {
     Message req(peer->conn()->readAll());
 
-    if (req.type() == Message::Type::Reject)
+    if (req.type() == MessageType::Reject)
       onRemoteRejected(peer);
-    if (req.type() == Message::Type::Accept)
+    if (req.type() == MessageType::Accept)
       onRemoteAccepted(peer, req);
   });
 }
@@ -95,7 +95,7 @@ void Server::tryReconnectAll()
 void Server::acceptIncomingPeer(Peer *peer)
 {
   finalizePeerConnection(peer);
-  Message res(Message::Type::Accept);
+  Message res(MessageType::Accept);
   res.setMetaData(m_user->name(), m_user->port(), m_user->pubKeyStr());
   peer->sendMsg(res, false);
   peer->activate();
@@ -143,7 +143,7 @@ void Server::handleNewConnection()
   connect(peer->conn(), &QTcpSocket::readyRead, this, [this, peer]() {
     Message req(peer->conn()->readAll());
 
-    if (req.type() == Message::Type::DataExchange) {
+    if (req.type() == MessageType::DataExchange) {
       peer->setName(req.hostName());
       peer->setPort(req.port());
       peer->setPublicKey(req.publicKey());
@@ -160,7 +160,7 @@ void Server::handleNewConnection()
         disconnect(peer->conn(), &QTcpSocket::readyRead, nullptr, nullptr);
         sessPeer->setConn(peer->conn());
         sessPeer->setPublicKey(peer->publicKey());
-        Message res(Message::Type::Accept);
+        Message res(MessageType::Accept);
         res.setMetaData(m_user->name(), m_user->port(), m_user->pubKeyStr());
         sessPeer->sendMsg(res, false);
         sessPeer->setupHandler();
