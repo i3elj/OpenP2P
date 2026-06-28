@@ -13,6 +13,41 @@ ApplicationWindow {
 	property Peer currentPeer: null
 	property PeerListModel peers: sessionManager.peers
 
+	menuBar: MenuBar {
+		Menu {
+			title: qsTr("&File")
+			Action {
+				text: qsTr("&New Connection")
+				onTriggered: newConnectionWindow.visible = true
+			}
+			Action { text: qsTr("&Reload Peers") }
+			MenuSeparator { }
+			Action { text: qsTr("&Quit") }
+		}
+
+		Menu {
+			title: qsTr("&Edit")
+			Action {
+				text: qsTr("&Preferences")
+				onTriggered: preferencesWindow.visible = true
+			}
+		}
+	}
+
+	Window {
+		id: newConnectionWindow
+		width: 400
+		height: 400
+		visible: false
+	}
+
+	Window {
+		id: preferencesWindow
+		width: 400
+		height: 400
+		visible: false
+	}
+
 	Component.onCompleted: timer.start()
 
 	Timer {
