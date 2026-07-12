@@ -3,7 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QObject>
-#include "peer.h"
+#include "src/peer.hpp"
 
 class PeerListModel : public QAbstractListModel
 {

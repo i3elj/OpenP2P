@@ -1,8 +1,8 @@
-#include "peer.h"
+#include "src/peer.hpp"
 #include <QDir>
 #include <QJsonArray>
 #include <QJsonObject>
-#include "self.h"
+#include "src/self.hpp"
 
 Peer::Peer(Self* user, QTcpSocket *conn, QObject *parent)
   : QObject{parent}
@@ -13,7 +13,7 @@ Peer::Peer(Self* user, QTcpSocket *conn, QObject *parent)
   , m_conn(conn)
   , m_active(false)
   , m_chatModel(new ChatListModel(this))
-  , m_user(user)
+  , m_self(user)
   , m_pubKey(nullptr)
   , m_crypto()
 {
@@ -33,7 +33,7 @@ Peer::Peer(Self *user, QObject *parent)
   , m_conn(new QTcpSocket(this))
   , m_active(false)
   , m_chatModel(new ChatListModel(this))
-  , m_user(user)
+  , m_self(user)
   , m_pubKey(nullptr)
   , m_crypto()
 {
@@ -136,7 +136,7 @@ void Peer::connectToHost() { m_conn->connectToHost(m_addr, m_port); }
 void Peer::sendMsg(Message msg, bool encrypt) {
   msg.setSent(true);
   QByteArray byteMsg = msg.toBytes();
-  QByteArray data = encrypt ? m_user->encrypt(m_pubKey, byteMsg) : byteMsg;
+  QByteArray data = encrypt ? m_self->encrypt(m_pubKey, byteMsg) : byteMsg;
   qint64 bytes = m_conn->write(data);
 
   if (bytes != -1 && msg.type() == MessageType::Common)
@@ -193,7 +193,7 @@ void Peer::saveChat() {
 
 void Peer::handle() {
   QByteArray data(m_conn->readAll());
-  Message req(m_user->decrypt(data));
+  Message req(m_self->decrypt(data));
   // Message req(m_conn->readAll());
   req.setSent(false);
 

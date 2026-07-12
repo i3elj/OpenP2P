@@ -4,8 +4,8 @@
 #include <QHostAddress>
 #include <QObject>
 #include <QSettings>
-#include "crypto.h"
-#include "ipv6addrresolver.h"
+#include "src/crypto.hpp"
+#include "src/ipv6addrresolver.hpp"
 
 class Self : public QObject
 {
@@ -47,6 +47,9 @@ public:
 
   void setName(QString newName);
   void setPort(int port);
+  // TODO: make this function announce any updates on self.
+  //
+  // void announce();
 
   QByteArray encrypt(EVP_PKEY *pubKey, QByteArray &data);
   QByteArray decrypt(QByteArray &data);

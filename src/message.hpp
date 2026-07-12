@@ -5,7 +5,13 @@
 #include <QJsonObject>
 #include <QObject>
 
-enum MessageType { Reject = 0, Accept = 1, Common = 2, DataExchange = 3 };
+enum MessageType {
+  Reject,
+  Accept,
+  Common,
+  DataExchange,
+  Update,
+};
 
 class Message
 {

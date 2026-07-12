@@ -2,8 +2,7 @@
 #define TYPEDEFS_H
 
 #include <QHostAddress>
-#include "peer.h"
-#include "peerid.h"
+#include "src/peer.hpp"
 
 typedef QList<QHostAddress> AddressList;
 typedef QHash<PeerId, Peer *> PeerHashMap;

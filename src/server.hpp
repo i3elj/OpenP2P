@@ -1,18 +1,18 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "peer.h"
-#include "sessionmanager.h"
+#include "src/peer.hpp"
+#include "src/self.hpp"
+#include "src/sessionmanager.hpp"
 #include <QTcpServer>
 #include <QThread>
-#include <self.h>
 
 class Server : public QTcpServer {
   Q_OBJECT
 
 private:
   SessionManager *m_session;
-  Self *m_user;
+  Self *m_self;
 
   void onRemoteRejected(Peer *peer);
   void onRemoteAccepted(Peer *peer, Message acceptMsg);

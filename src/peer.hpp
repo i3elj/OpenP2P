@@ -4,10 +4,10 @@
 #include <QHostAddress>
 #include <QObject>
 #include <QTcpSocket>
-#include "crypto.h"
-#include "gui/chatlistmodel.h"
-#include "message.h"
-#include "self.h"
+#include "src/crypto.hpp"
+#include "src/gui/chatlistmodel.hpp"
+#include "src/message.hpp"
+#include "src/self.hpp"
 
 struct PeerId
 {
@@ -59,7 +59,7 @@ private:
   QTcpSocket *m_conn;
   bool m_active;
   ChatListModel* m_chatModel;
-  Self* m_user;
+  Self* m_self;
   EVP_PKEY *m_pubKey;
   Crypto m_crypto;
 

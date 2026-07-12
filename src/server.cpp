@@ -1,4 +1,4 @@
-#include "server.h"
+#include "src/server.hpp"
 
 /**
  * Private Functions
@@ -38,9 +38,9 @@ void Server::finalizePeerConnection(Peer *peer)
 void Server::exchangeData(Peer *peer)
 {
   connect(peer->conn(), &QTcpSocket::connected, this, [this, peer]() {
-    Message req(MessageType::DataExchange);
-    req.setMetaData(m_user->name(), m_user->port(), m_user->pubKeyStr());
-    peer->sendMsg(req, false);
+    Message msg(MessageType::DataExchange);
+    msg.setMetaData(m_self->name(), m_self->port(), m_self->pubKeyStr());
+    peer->sendMsg(msg, false);
   });
 
   connect(peer->conn(), &QTcpSocket::readyRead, this, [this, peer]() {
@@ -70,10 +70,10 @@ void Server::tryReconnecting(Peer *peer)
 Server::Server(Self *user, SessionManager *sm, QObject *parent)
   : QTcpServer{parent}
   , m_session(sm)
-  , m_user(user)
+  , m_self(user)
 {
-  listen(m_user->address(), m_user->port());
-  connect(m_user, &Self::portChanged, this, &Server::restartServer);
+  listen(m_self->address(), m_self->port());
+  connect(m_self, &Self::portChanged, this, &Server::restartServer);
 }
 
 void Server::initTcpSocket()
@@ -96,7 +96,7 @@ void Server::acceptIncomingPeer(Peer *peer)
 {
   finalizePeerConnection(peer);
   Message res(MessageType::Accept);
-  res.setMetaData(m_user->name(), m_user->port(), m_user->pubKeyStr());
+  res.setMetaData(m_self->name(), m_self->port(), m_self->pubKeyStr());
   peer->sendMsg(res, false);
   peer->activate();
 }
@@ -119,7 +119,7 @@ void Server::startNewConn(QString address, int port)
     return;
   }
 
-  Peer *peer = new Peer(m_user, this);
+  Peer *peer = new Peer(m_self, this);
 
   if (!peer->setAddressAndPort(address, port)) {
     emit wrongAddress(address);
@@ -138,7 +138,7 @@ void Server::startNewConn(QString address, int port)
 void Server::handleNewConnection()
 {
   QTcpSocket *conn = nextPendingConnection();
-  Peer *peer = new Peer(m_user, conn, this);
+  Peer *peer = new Peer(m_self, conn, this);
 
   connect(peer->conn(), &QTcpSocket::readyRead, this, [this, peer]() {
     Message req(peer->conn()->readAll());
@@ -161,7 +161,7 @@ void Server::handleNewConnection()
         sessPeer->setConn(peer->conn());
         sessPeer->setPublicKey(peer->publicKey());
         Message res(MessageType::Accept);
-        res.setMetaData(m_user->name(), m_user->port(), m_user->pubKeyStr());
+        res.setMetaData(m_self->name(), m_self->port(), m_self->pubKeyStr());
         sessPeer->sendMsg(res, false);
         sessPeer->setupHandler();
         peer->deleteLater();
@@ -175,5 +175,5 @@ void Server::handleNewConnection()
 
 void Server::restartServer() {
   close();
-  listen(m_user->address(), m_user->port());
+  listen(m_self->address(), m_self->port());
 }

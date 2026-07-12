@@ -1,5 +1,5 @@
-#include "message.h"
-#include "self.h"
+#include "src/message.hpp"
+#include "src/self.hpp"
 
 Message::Message()
   : m_text("")

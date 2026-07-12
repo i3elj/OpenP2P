@@ -1,10 +1,10 @@
-#include "sessionmanager.h"
+#include "src/sessionmanager.hpp"
 #include <QBuffer>
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonObject>
-#include "self.h"
+#include "src/self.hpp"
 
 /**
  * Private functions.
@@ -15,7 +15,7 @@ bool SessionManager::loadSavedPeers() {
 
   for (const QJsonValueRef &entry : peersArray) {
     QJsonObject json = entry.toObject();
-    Peer *peer = new Peer(m_user, this);
+    Peer *peer = new Peer(m_self, this);
     peer->setName(json[Self::SettingsKeys::Name].toString());
     peer->setAddr(json[Self::SettingsKeys::Addr].toString());
     peer->setPort(json[Self::SettingsKeys::Port].toInt());
@@ -71,7 +71,7 @@ QJsonArray SessionManager::loadPeersFromFile() {
 
 SessionManager::SessionManager(Self *user, QObject *parent)
   : QObject{parent}
-  , m_user(user)
+  , m_self(user)
   , m_peerModel(new PeerListModel(this))
 {
   loadSavedPeers();

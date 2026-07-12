@@ -1,4 +1,4 @@
-#include "ipv6addrresolver.h"
+#include "src/ipv6addrresolver.hpp"
 #include <QNetworkInterface>
 
 IPv6AddrResolver::IPv6AddrResolver(QObject *parent)

@@ -1,9 +1,9 @@
 #ifndef SESSIONMANAGER_H
 #define SESSIONMANAGER_H
 
-#include "peer.h"
-#include "self.h"
-#include "gui/peerlistmodel.h"
+#include "src/peer.hpp"
+#include "src/self.hpp"
+#include "src/gui/peerlistmodel.hpp"
 #include <QAbstractItemModel>
 #include <QObject>
 
@@ -15,7 +15,7 @@ private:
   const QString m_chatsFilePath = "/OpenP2P/chats";
   PeerListModel *m_peerModel;
   QHash<PeerId, Peer*> m_peerMap;
-  Self *m_user;
+  Self *m_self;
 
   bool loadSavedPeers();
   bool savePeersToFile(QJsonArray peers);

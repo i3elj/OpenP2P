@@ -1,4 +1,4 @@
-#include "self.h"
+#include "src/self.hpp"
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>

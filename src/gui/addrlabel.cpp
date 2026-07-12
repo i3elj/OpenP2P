@@ -1,4 +1,4 @@
-#include "gui/addrlabel.h"
+#include "src/gui/addrlabel.hpp"
 
 AddrLabel::AddrLabel(QObject *parent)
     : QObject{parent}

@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QThread>
-#include "ipv6addrresolver.h"
+#include "src/ipv6addrresolver.hpp"
 
 class AddrLabel : public QObject
 {

@@ -5,11 +5,11 @@
 #include <QQmlContext>
 #include <QStandardPaths>
 #include <QQuickStyle>
-#include "gui/addrlabel.h"
-#include "peer.h"
-#include "self.h"
-#include "server.h"
-#include "sessionmanager.h"
+#include "src/gui/addrlabel.hpp"
+#include "src/peer.hpp"
+#include "src/self.hpp"
+#include "src/server.hpp"
+#include "src/sessionmanager.hpp"
 
 #define APP "OpenP2P"
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     []() { QCoreApplication::exit(-1); },
     Qt::QueuedConnection);
 
-  engine.loadFromModule("p2pcom", "Main");
+  engine.loadFromModule("openp2p", "Main");
 
   return app.exec();
 }

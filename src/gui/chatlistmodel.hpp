@@ -2,7 +2,7 @@
 #define CHATLISTMODEL_H
 
 #include <QAbstractListModel>
-#include "message.h"
+#include "src/message.hpp"
 
 class ChatListModel : public QAbstractListModel
 {
