@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=OpenP2P
+Exec=AppRun %F
+Icon=openp2p
+Comment=Peer-to-peer chat application
+Terminal=true
+Categories=Network
+X-AppImage-Version=4a6bcd1

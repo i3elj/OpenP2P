@@ -83,3 +83,15 @@ CMakeLists.txt.user*
 build/*
 !build/README.md
 .cache/
+installer/linux/lib
+installer/linux/doc
+installer/linux/plugins
+installer/linux/qml
+installer/linux/translations
+installer/linux/.DirIcon
+installer/linux/.zip
+installer/linux/AppRun
+installer/linux/openp2p_app
+installer/*.AppImage
+!installer/Makefile
+!Makefile
