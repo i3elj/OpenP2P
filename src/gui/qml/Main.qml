@@ -173,8 +173,14 @@ ApplicationWindow {
 					}
 
 					RowLayout {
+						Text {
+							text: "No IPv6 found. Check your internet connection or with your ISP."
+							visible: ipList.ipModel.length === 0
+						}
+
 						Repeater {
 							model: ipList.ipModel
+							visible: ipList.ipModel.length > 0
 
 							TextEdit {
 								required property string modelData

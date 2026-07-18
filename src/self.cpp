@@ -29,11 +29,13 @@ Self::Self(QObject *parent)
   , m_settings(new QSettings(this))
   , m_ipr(new IPv6AddrResolver(this))
   , m_name(m_settings->value(SettingsKeys::Name, "").toString())
-  , m_address(m_ipr->resolve().first())
+  , m_address()
   , m_port(m_settings->value(SettingsKeys::Port, 7755).toInt())
   , m_pkey(nullptr)
   , m_crypto(this)
 {
+  const auto addrs = m_ipr->resolve();
+  m_address = addrs.isEmpty() ? QHostAddress() : addrs.first();
   m_pkey = m_crypto.generateKey();
 }
 
