@@ -35,6 +35,10 @@ void Server::finalizePeerConnection(Peer *peer)
   emit peerConnectionFinalized(peer);
 }
 
+/**
+ * @warning Connects to state changes are temporary and should be changed or
+ * removed once debugging process is done
+ */
 void Server::exchangeData(Peer *peer)
 {
   connect(peer->conn(), &QTcpSocket::connected, this, [this, peer]() {
@@ -50,6 +54,28 @@ void Server::exchangeData(Peer *peer)
       onRemoteRejected(peer);
     if (req.type() == MessageType::Accept)
       onRemoteAccepted(peer, req);
+  });
+
+  connect(peer->conn(), &QTcpSocket::stateChanged, this, [this, peer]() {
+    const auto state = peer->conn()->state();
+    QHash<QAbstractSocket::SocketState, QString> states = {
+      {QAbstractSocket::UnconnectedState,  "UnconnectedState"},
+      {QAbstractSocket::HostLookupState, "HostLookupState"},
+      {QAbstractSocket::ConnectingState, "ConnectingState"},
+      {QAbstractSocket::ConnectedState, "ConnectedState"},
+      {QAbstractSocket::BoundState, "BoundState"},
+      {QAbstractSocket::ClosingState, "ClosingState"},
+      {QAbstractSocket::ListeningState, "ListeningState"},
+    };
+    qWarning() << "Peer socket is in" << states.value(state);
+  });
+
+  connect(peer->conn(), &QTcpSocket::hostFound, this, [this, peer]() {
+    qWarning() << "Peer found a host (?)";
+  });
+
+  connect(peer->conn(), &QTcpSocket::errorOccurred, this, [this, peer](QAbstractSocket::SocketError error) {
+    qWarning() << "Error occurred: " << error << peer->conn()->errorString();
   });
 }
 
