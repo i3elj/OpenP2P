@@ -92,6 +92,7 @@ installer/linux/.DirIcon
 installer/linux/.zip
 installer/linux/AppRun
 installer/linux/openp2p_app
+installer/windows
 installer/*.AppImage
 !installer/Makefile
 !Makefile
