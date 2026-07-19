@@ -34,8 +34,7 @@ Self::Self(QObject *parent)
   , m_pkey(nullptr)
   , m_crypto(this)
 {
-  const auto addrs = m_ipr->resolve();
-  m_address = addrs.isEmpty() ? QHostAddress() : addrs.first();
+  m_address = m_ipr->resolve().isEmpty() ? QHostAddress() : QHostAddress::AnyIPv6;
   m_pkey = m_crypto.generateKey();
 }
 
