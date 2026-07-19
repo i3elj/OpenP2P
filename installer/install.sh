@@ -3,8 +3,9 @@ currdir="$(pwd)"
 appname="openp2p_app"
 src="$currdir/../src"
 qmldir="$src/gui/qml"
+release="Desktop-Release"
 
-install-linux() {
+install_linux() {
   rm -rf \
     "$currdir/linux/lib" \
     "$currdir/linux/plugins" \
@@ -13,7 +14,7 @@ install-linux() {
     "$currdir/linux/AppRun" \
     "$currdir/linux/$appname"
 
-  cp "$currdir/../build/Desktop_Release/$appname" "$currdir/linux/$appname"
+  cp "$currdir/../build/$release/$appname" "$currdir/linux/$appname"
 
   linuxdeployqt "$currdir/linux/$appname" \
     -appimage \
@@ -22,4 +23,4 @@ install-linux() {
     -unsupported-allow-new-glibc
 }
 
-install-linux
+install_linux
