@@ -81,6 +81,11 @@ Frame {
 
 		TextArea {
 		  id: msgInput
+		  background: Rectangle {
+			border.color: palette.mid
+			border.width: 1
+			color: palette.light
+		  }
 
 		  function sendMessage() {
 			let cleanMessage = msgInput.text.trim();
