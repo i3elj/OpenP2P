@@ -17,7 +17,7 @@ private:
   void onRemoteRejected(Peer *peer);
   void onRemoteAccepted(Peer *peer, Message acceptMsg);
   void finalizePeerConnection(Peer *peer);
-  void exchangeData(Peer *peer);
+  void firstHandShake(Peer *peer);
   void tryReconnecting(Peer *peer);
 
 public:

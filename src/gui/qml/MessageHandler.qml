@@ -27,19 +27,15 @@ Frame {
 	}
 
 	prevPeer = peer;
-  // if (peer !== null) {
-  // 	prevPeer.saveChat()
-  // 	peer.loadChat()
-  // }
   }
 
   Connections {
+	target: peer
+
 	function onMsgSent(msg) {
 	  msgInput.clear();
 	  chatList.positionViewAtEnd();
 	}
-
-	target: peer
   }
 
   ColumnLayout {
@@ -59,15 +55,6 @@ Frame {
 		width: chatList.width
 		wrapMode: Label.Wrap
 	  }
-
-	  // function addMessage(sent, text) {
-	  // 	let newMsg = {
-	  // 		"sent": sent,
-	  // 		"text": !text.endsWith("\n") ? text + "\n" : text
-	  // 	}
-	  // 	chatList.model.append(newMsg)
-	  // 	chatList.positionViewAtEnd()
-	  //}
 	}
 
 	RowLayout {

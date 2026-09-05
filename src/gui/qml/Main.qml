@@ -87,7 +87,6 @@ ApplicationWindow {
 							id: ctxMenu
 							MenuItem {
 								text: "Remover"
-
 								onTriggered: sessionManager.deletePeer(model.peer)
 							}
 						}

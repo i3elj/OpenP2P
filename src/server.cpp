@@ -35,7 +35,7 @@ void Server::finalizePeerConnection(Peer *peer)
   emit peerConnectionFinalized(peer);
 }
 
-void Server::exchangeData(Peer *peer)
+void Server::firstHandShake(Peer *peer)
 {
   connect(peer->conn(), &QTcpSocket::connected, this, [this, peer]() {
     Message msg(MessageType::DataExchange);
@@ -58,7 +58,7 @@ void Server::tryReconnecting(Peer *peer)
   if (peer->isActive()) {
     emit peerAlreadyConnected(peer->id());
   } else {
-    exchangeData(peer);
+    firstHandShake(peer);
     peer->connectToHost();
   }
 }
@@ -103,6 +103,8 @@ void Server::acceptIncomingPeer(Peer *peer)
 
 void Server::rejectIncomingPeer(Peer *peer)
 {
+  peer->sendMsg(Message(MessageType::Reject));
+
   disconnect(peer->conn(), &QTcpSocket::connected, nullptr, nullptr);
   disconnect(peer->conn(), &QTcpSocket::readyRead, nullptr, nullptr);
 
@@ -127,7 +129,7 @@ void Server::startNewConn(QString address, int port)
     return;
   }
 
-  exchangeData(peer);
+  firstHandShake(peer);
   peer->connectToHost();
 }
 

@@ -94,6 +94,7 @@ void SessionManager::addPeer(Peer *peer) {
 }
 
 void SessionManager::deletePeer(Peer *peer) {
+  peer->deactivate();
   m_peerMap.remove(peer->id());
   m_peerModel->removePeer(peer);
 }
